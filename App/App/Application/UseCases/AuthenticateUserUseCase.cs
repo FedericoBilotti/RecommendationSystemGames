@@ -2,18 +2,19 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using App.App.Domain.Entities;
 using App.Application.Interfaces;
+using App.Domain.Entities;
 using App.Infrastructure.Database;
-using App.Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.Application.Services;
+namespace App.Application.UseCases;
 
-public class AuthenticateUserService(AppDbContext context, IConfiguration configuration) : IAuthService
+public class AuthenticateUserUseCase(AppDbContext context, IConfiguration configuration) : IAuthService
 {
+    
+    
     public async Task<User?> RegisterAsync(UserDto requestUserDto)
     {
         if (await SearchUserByUsername(requestUserDto) != null)
@@ -31,7 +32,7 @@ public class AuthenticateUserService(AppDbContext context, IConfiguration config
         return user;
     }
 
-    public async Task<TokenResponeDto?> LoginAsync(UserDto requestUserDto)
+    public async Task<TokenResponseDto?> LoginAsync(UserDto requestUserDto)
     {
         var user = await SearchUserByUsername(requestUserDto);
 
@@ -46,7 +47,7 @@ public class AuthenticateUserService(AppDbContext context, IConfiguration config
         return await CreateTokenResponse(user);
     }
 
-    public async Task<TokenResponeDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
+    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
     {
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);
         
@@ -56,9 +57,9 @@ public class AuthenticateUserService(AppDbContext context, IConfiguration config
         return await CreateTokenResponse(user);
     }
 
-    private async Task<TokenResponeDto> CreateTokenResponse(User user)
+    private async Task<TokenResponseDto> CreateTokenResponse(User user)
     {
-        var response = new TokenResponeDto
+        var response = new TokenResponseDto
         {
             AccessToken = GenerateToken(user),
             RefreshToken = await GenerateAndSaveRefreshToken(user)

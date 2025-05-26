@@ -1,4 +1,4 @@
-namespace App.Infrastructure.Models.Dtos;
+namespace App.Application.UseCases;
 
 public class RefreshTokenRequestDto
 {

@@ -1,6 +1,6 @@
 using System.Text;
 using App.Application.Interfaces;
-using App.Application.Services;
+using App.Application.UseCases;
 using App.Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             };
         });
 
-builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
+builder.Services.AddScoped<IAuthService, AuthenticateUserUseCase>();
 
 
 var app = builder.Build();

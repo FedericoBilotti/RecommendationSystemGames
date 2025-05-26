@@ -1,4 +1,4 @@
-using App.App.Domain.Entities;
+using App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Infrastructure.Database;

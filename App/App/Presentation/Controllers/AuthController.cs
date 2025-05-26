@@ -1,10 +1,10 @@
-using App.App.Domain.Entities;
 using App.Application.Interfaces;
-using App.Infrastructure.Models.Dtos;
+using App.Application.UseCases;
+using App.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Infrastructure.Controllers;
+namespace App.Presentation.Controllers;
 
 [Route("[controller]")]
 [ApiController]
@@ -24,7 +24,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(UserDto requestUserDto)
     {
-        TokenResponeDto? tokenResult = await authService.LoginAsync(requestUserDto);
+        TokenResponseDto? tokenResult = await authService.LoginAsync(requestUserDto);
         
         if (tokenResult == null)
             return BadRequest("User not found or the password is wrong");
@@ -33,9 +33,9 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    public async Task<ActionResult<TokenResponeDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
     {
-        TokenResponeDto? result = await authService.RefreshTokenAsync(requestRefreshTokenDto);
+        TokenResponseDto? result = await authService.RefreshTokenAsync(requestRefreshTokenDto);
         
         if (result?.AccessToken == null || result?.RefreshToken == null)
             return Unauthorized("Refresh token is invalid");

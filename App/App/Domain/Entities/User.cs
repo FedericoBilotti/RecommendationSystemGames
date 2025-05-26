@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace App.App.Domain.Entities;
+namespace App.Domain.Entities;
 
 public class User
 {
@@ -12,5 +12,4 @@ public class User
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpirationTime { get; set; }
     // public string Email { get; set; } = string.Empty;
-    
 }

@@ -1,6 +1,6 @@
-namespace App.Infrastructure.Models.Dtos;
+namespace App.Application.UseCases;
 
-public class TokenResponeDto
+public class TokenResponseDto
 {
     public required string AccessToken { get; set; }
     public required string RefreshToken { get; set; }
