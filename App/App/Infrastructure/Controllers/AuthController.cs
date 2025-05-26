@@ -1,6 +1,6 @@
 using App.Application.Interfaces;
 using App.Domain.Entities;
-using App.Infrastructure.Models.User;
+using App.Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,12 +24,23 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(UserDto requestUserDto)
     {
-        string? token = await authService.LoginAsync(requestUserDto);
+        TokenResponeDto? tokenResult = await authService.LoginAsync(requestUserDto);
         
-        if (token == null)
+        if (tokenResult == null)
             return BadRequest("User not found or the password is wrong");
         
-        return Ok(token);
+        return Ok(tokenResult);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<TokenResponeDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
+    {
+        TokenResponeDto? result = await authService.RefreshTokenAsync(requestRefreshTokenDto);
+        
+        if (result?.AccessToken == null || result?.RefreshToken == null)
+            return Unauthorized("Refresh token is invalid");
+        
+        return Ok(result);
     }
 
     [Authorize]

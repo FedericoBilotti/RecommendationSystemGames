@@ -1,4 +1,5 @@
-namespace App.Infrastructure.Models.User;
+namespace App.Infrastructure.Models.Dtos
+;
 
 public class UserDto
 {
