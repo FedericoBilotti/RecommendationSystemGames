@@ -1,5 +1,5 @@
+using App.Application.Interfaces;
 using App.Domain.Entities.User;
-using App.Domain.Interfaces;
 
 namespace App.Application.Data;
 
