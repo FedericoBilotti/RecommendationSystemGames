@@ -1,5 +1,5 @@
+using App.App.Domain.Entities;
 using App.Application.Interfaces;
-using App.Domain.Entities;
 using App.Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

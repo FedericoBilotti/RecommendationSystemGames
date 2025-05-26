@@ -1,4 +1,4 @@
-using App.Domain.Entities;
+using App.App.Domain.Entities;
 using App.Infrastructure.Models.Dtos;
 
 namespace App.Application.Interfaces;

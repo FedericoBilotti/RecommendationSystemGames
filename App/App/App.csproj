@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Application\UseCases\" />
+      <Folder Include="App.Application\UseCases\" />
     </ItemGroup>
 
 </Project>
