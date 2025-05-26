@@ -1,0 +1,5 @@
+@host = http://localhost:7023
+
+GET {{host}}/Login/
+
+###
