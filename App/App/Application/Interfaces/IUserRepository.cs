@@ -1,4 +1,4 @@
-using App.Domain.Entities.User;
+using App.Domain.Entities;
 
 namespace App.Application.Interfaces;
 

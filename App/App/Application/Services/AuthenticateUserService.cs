@@ -2,8 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using App.Application.Interfaces;
+using App.Domain.Entities;
 using App.Infrastructure.Models.User;
-using App.Domain.Entities.User;
 using App.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +50,8 @@ public class AuthenticateUserService(AppDbContext context, IConfiguration config
         var claims = new List<Claim>
         {
             new(ClaimTypes.Name, user.Username),
-            new(ClaimTypes.NameIdentifier, user.UserId.ToString())
+            new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new(ClaimTypes.Role, user.Role)
         };
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));

@@ -1,4 +1,4 @@
-using App.Domain.Entities.User;
+using App.Domain.Entities;
 using App.Infrastructure.Models.User;
 
 namespace App.Application.Interfaces;

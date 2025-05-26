@@ -1,5 +1,5 @@
 using App.Application.Interfaces;
-using App.Domain.Entities.User;
+using App.Domain.Entities;
 using App.Infrastructure.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +33,17 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet]
+    [HttpGet("Authenticate")]
     public IActionResult AuthenticatedOnlyEndpoint()
     {
         return Ok("You are authenticated");
+    }
+    
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin-only")]
+    public IActionResult AuthenticatedAdmin()
+    {
+        return Ok("You are authenticated as an admin");
     }
 }
