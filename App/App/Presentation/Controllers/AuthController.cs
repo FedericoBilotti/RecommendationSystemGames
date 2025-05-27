@@ -1,3 +1,4 @@
+using App.Application.Dtos;
 using App.Application.Interfaces;
 using App.Application.UseCases;
 using App.Domain.Entities;
@@ -8,7 +9,7 @@ namespace App.Presentation.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(UserDto requestUserDto)
@@ -35,7 +36,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
     {
-        TokenResponseDto? result = await authService.RefreshTokenAsync(requestRefreshTokenDto);
+        TokenResponseDto? result = await tokenService.RefreshTokenAsync(requestRefreshTokenDto);
         
         if (result?.AccessToken == null || result?.RefreshToken == null)
             return Unauthorized("Refresh token is invalid");

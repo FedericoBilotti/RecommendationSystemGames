@@ -1,4 +1,5 @@
 using System.Text;
+using App.Application.Data;
 using App.Application.Interfaces;
 using App.Application.UseCases;
 using App.Infrastructure.Database;
@@ -34,7 +35,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         });
 
 builder.Services.AddScoped<IAuthService, AuthenticateUserUseCase>();
-
+builder.Services.AddScoped<ITokenService, AuthTokenUseCase>();
+builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
 
 var app = builder.Build();
 

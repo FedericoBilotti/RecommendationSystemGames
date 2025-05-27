@@ -1,3 +1,4 @@
+using App.Application.Dtos;
 using App.Application.UseCases;
 using App.Domain.Entities;
 
@@ -7,5 +8,4 @@ public interface IAuthService
 {
     Task<User?> RegisterAsync(UserDto requestUserDto);
     Task<TokenResponseDto?> LoginAsync(UserDto requestUserDto);
-    Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto);
 }
