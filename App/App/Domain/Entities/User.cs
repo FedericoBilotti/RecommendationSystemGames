@@ -10,6 +10,8 @@ public class User
     [StringLength(100)] public string HashedPassword { get; set; } = string.Empty;
     [StringLength(15)] public string Role { get; set; } = string.Empty;
     
+    public ICollection<Game> FavoriteGames { get; set; } = [];
+    
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpirationTime { get; set; }
 }

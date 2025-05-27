@@ -4,6 +4,7 @@ using App.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250527175146_migrationTables")]
+    partial class migrationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,15 +38,10 @@ namespace App.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("UserRating")
                         .HasColumnType("int");
 
                     b.HasKey("GameId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Games");
                 });
@@ -100,13 +98,6 @@ namespace App.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("App.Domain.Entities.Game", b =>
-                {
-                    b.HasOne("App.Domain.Entities.User", null)
-                        .WithMany("FavoriteGames")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("App.Domain.Entities.Genre", b =>
                 {
                     b.HasOne("App.Domain.Entities.Game", null)
@@ -119,11 +110,6 @@ namespace App.Migrations
             modelBuilder.Entity("App.Domain.Entities.Game", b =>
                 {
                     b.Navigation("Genres");
-                });
-
-            modelBuilder.Entity("App.Domain.Entities.User", b =>
-                {
-                    b.Navigation("FavoriteGames");
                 });
 #pragma warning restore 612, 618
         }

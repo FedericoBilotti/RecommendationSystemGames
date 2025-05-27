@@ -2,8 +2,10 @@ using System.Text;
 using App.Application.Data;
 using App.Application.Interfaces;
 using App.Application.UseCases;
+using App.Domain.Entities;
 using App.Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -37,8 +39,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<IAuthService, AuthenticateUserUseCase>();
 builder.Services.AddScoped<ITokenService, AuthTokenUseCase>();
 builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    services.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {
