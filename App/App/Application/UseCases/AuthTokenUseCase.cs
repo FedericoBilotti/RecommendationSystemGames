@@ -14,12 +14,11 @@ public class AuthTokenUseCase(AppDbContext context, IUserRepository userReposito
 {
     public async Task<TokenResponseDto> CreateTokenResponse(User user)
     {
-        var response = new TokenResponseDto
+        return new TokenResponseDto
         {
             AccessToken = GenerateToken(user),
             RefreshToken = await GenerateAndSaveRefreshToken(user)
         };
-        return response;
     }
     
     public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
@@ -39,14 +38,6 @@ public class AuthTokenUseCase(AppDbContext context, IUserRepository userReposito
         return isNotValid ? null : user;
     }
 
-    private string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
-    }
-
     private async Task<string> GenerateAndSaveRefreshToken(User user)
     {
         string refreshToken = GenerateRefreshToken();
@@ -54,6 +45,14 @@ public class AuthTokenUseCase(AppDbContext context, IUserRepository userReposito
         user.RefreshTokenExpirationTime = DateTime.UtcNow.AddMinutes(30);
         await context.SaveChangesAsync();
         return refreshToken;
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 
     private string GenerateToken(User user)
