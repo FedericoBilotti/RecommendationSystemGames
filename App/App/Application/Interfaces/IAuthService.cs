@@ -1,5 +1,4 @@
 using App.Application.Dtos;
-using App.Application.UseCases;
 using App.Domain.Entities;
 
 namespace App.Application.Interfaces;

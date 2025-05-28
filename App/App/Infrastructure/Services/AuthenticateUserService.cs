@@ -4,9 +4,9 @@ using App.Domain.Entities;
 using App.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.Infrastructure.Authentication;
+namespace App.Infrastructure.Services;
 
-public class AuthenticateUser(
+public class AuthenticateUserService(
         AppDbContext context, 
         IUserRepository userRepository, 
         IPasswordHasher<User> hasher, 
@@ -31,7 +31,7 @@ public class AuthenticateUser(
 
     public async Task<TokenResponseDto?> LoginAsync(UserRequestDto requestUserRequestDto)
     {
-        var user = await userRepository.GetUserByUsername(context, requestUserRequestDto);
+        User? user = await userRepository.GetUserByUsername(context, requestUserRequestDto);
 
         if (user == null) return null;
 

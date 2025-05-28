@@ -8,9 +8,9 @@ using App.Domain.Entities;
 using App.Infrastructure.Database;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.Infrastructure.Authentication;
+namespace App.Infrastructure.Services;
 
-public class AuthToken(AppDbContext context, IUserRepository userRepository, IConfiguration configuration) : ITokenService
+public class AuthTokenService(AppDbContext context, IUserRepository userRepository, IConfiguration configuration) : ITokenService
 {
     public async Task<TokenResponseDto> CreateTokenResponse(User user)
     {
