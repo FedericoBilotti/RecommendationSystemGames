@@ -1,4 +1,4 @@
-namespace App.RM.Application.Dtos;
+namespace App.RM.Application.Dtos.Authentication;
 
 public class TokenResponseDto
 {
