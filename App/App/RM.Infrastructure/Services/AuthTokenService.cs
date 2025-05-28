@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using App.RM.Application.Dtos;
 using App.RM.Application.Dtos.Authentication;
 using App.RM.Application.Interfaces;
 using App.RM.Application.Interfaces.Authentication;
