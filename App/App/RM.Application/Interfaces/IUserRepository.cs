@@ -1,4 +1,4 @@
-using App.RM.Application.Dtos;
+using App.RM.Application.Dtos.Authentication;
 using App.RM.Domain.Entities;
 using App.RM.Infrastructure.Database;
 
