@@ -13,14 +13,14 @@ public class AuthenticateUser(
         ITokenService tokens) 
         : IAuthService
 {
-    public async Task<User?> RegisterAsync(UserDto requestUserDto)
+    public async Task<User?> RegisterAsync(UserRequestDto requestUserRequestDto)
     {
-        if (await userRepository.GetUserByUsername(context, requestUserDto) != null) return null;
+        if (await userRepository.GetUserByUsername(context, requestUserRequestDto) != null) return null;
 
         var user = new User();
 
-        string hashedPassword = hasher.HashPassword(user, requestUserDto.Password);
-        user.Username = requestUserDto.Username;
+        string hashedPassword = hasher.HashPassword(user, requestUserRequestDto.Password);
+        user.Username = requestUserRequestDto.Username;
         user.HashedPassword = hashedPassword;
 
         context.Users.Add(user);
@@ -29,13 +29,13 @@ public class AuthenticateUser(
         return user;
     }
 
-    public async Task<TokenResponseDto?> LoginAsync(UserDto requestUserDto)
+    public async Task<TokenResponseDto?> LoginAsync(UserRequestDto requestUserRequestDto)
     {
-        var user = await userRepository.GetUserByUsername(context, requestUserDto);
+        var user = await userRepository.GetUserByUsername(context, requestUserRequestDto);
 
         if (user == null) return null;
 
-        PasswordVerificationResult passwordVerificationResult = hasher.VerifyHashedPassword(user, user.HashedPassword, requestUserDto.Password);
+        PasswordVerificationResult passwordVerificationResult = hasher.VerifyHashedPassword(user, user.HashedPassword, requestUserRequestDto.Password);
 
         if (passwordVerificationResult == PasswordVerificationResult.Failed) return null;
 

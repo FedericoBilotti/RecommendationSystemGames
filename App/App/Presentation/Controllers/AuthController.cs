@@ -9,12 +9,12 @@ namespace App.Presentation.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
+public class AuthController(AuthenticateUserUseCase authUseCase, AuthTokenUseCase tokenUseCase) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<ActionResult<User>> Register(UserDto requestUserDto)
+    public async Task<ActionResult<User>> Register(UserRequestDto requestUserRequestDto)
     {
-        User? user = await authService.RegisterAsync(requestUserDto);
+        User? user = await authUseCase.RegisterAsync(requestUserRequestDto);
         
         if (user == null)
             return BadRequest("User already exists");
@@ -23,9 +23,9 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(UserDto requestUserDto)
+    public async Task<ActionResult<string>> Login(UserRequestDto requestUserRequestDto)
     {
-        TokenResponseDto? tokenResult = await authService.LoginAsync(requestUserDto);
+        TokenResponseDto? tokenResult = await authUseCase.LoginAsync(requestUserRequestDto);
         
         if (tokenResult == null)
             return BadRequest("User not found or the password is wrong");
@@ -36,7 +36,7 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     [HttpPost("refresh-token")]
     public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
     {
-        TokenResponseDto? result = await tokenService.RefreshTokenAsync(requestRefreshTokenDto);
+        TokenResponseDto? result = await tokenUseCase.RefreshTokenAsync(requestRefreshTokenDto);
         
         if (result?.AccessToken == null || result?.RefreshToken == null)
             return Unauthorized("Refresh token is invalid");

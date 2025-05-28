@@ -8,5 +8,5 @@ namespace App.Application.Interfaces;
 public interface IUserRepository
 {
     Task<User?> GetUserById(AppDbContext context, Guid userId);
-    Task<User?> GetUserByUsername(AppDbContext context, UserDto requestUserDto);
+    Task<User?> GetUserByUsername(AppDbContext context, UserRequestDto requestUserRequestDto);
 }

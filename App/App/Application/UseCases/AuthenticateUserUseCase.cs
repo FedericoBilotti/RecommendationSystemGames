@@ -6,13 +6,13 @@ namespace App.Application.UseCases;
 
 public class AuthenticateUserUseCase(IAuthService authService)
 {
-    public async Task<User?> RegisterAsync(UserDto requestUserDto)
+    public async Task<User?> RegisterAsync(UserRequestDto requestUserRequestDto)
     {
-        return await authService.RegisterAsync(requestUserDto);
+        return await authService.RegisterAsync(requestUserRequestDto);
     }
 
-    public async Task<TokenResponseDto?> LoginAsync(UserDto requestUserDto)
+    public async Task<TokenResponseDto?> LoginAsync(UserRequestDto requestUserRequestDto)
     {
-        return await authService.LoginAsync(requestUserDto);
+        return await authService.LoginAsync(requestUserRequestDto);
     }
 }
