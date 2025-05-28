@@ -1,10 +1,10 @@
-using App.Application.Dtos;
-using App.Application.Interfaces;
-using App.Domain.Entities;
+using App.RM.Application.Dtos;
+using App.RM.Application.Interfaces;
+using App.RM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.Presentation.Controllers;
+namespace App.RM.Presentation.Controllers;
 
 [Route("[controller]")]
 [ApiController]

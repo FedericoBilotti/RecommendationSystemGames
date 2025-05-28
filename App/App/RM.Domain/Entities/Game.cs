@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace App.Domain.Entities;
+namespace App.RM.Domain.Entities;
 
 public class Game
 {

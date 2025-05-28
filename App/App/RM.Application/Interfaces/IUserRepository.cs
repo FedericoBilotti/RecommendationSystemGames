@@ -1,9 +1,8 @@
-using App.Application.Dtos;
-using App.Application.UseCases;
-using App.Domain.Entities;
-using App.Infrastructure.Database;
+using App.RM.Application.Dtos;
+using App.RM.Domain.Entities;
+using App.RM.Infrastructure.Database;
 
-namespace App.Application.Interfaces;
+namespace App.RM.Application.Interfaces;
 
 public interface IUserRepository
 {

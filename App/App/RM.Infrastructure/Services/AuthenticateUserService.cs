@@ -1,10 +1,10 @@
-using App.Application.Dtos;
-using App.Application.Interfaces;
-using App.Domain.Entities;
-using App.Infrastructure.Database;
+using App.RM.Application.Dtos;
+using App.RM.Application.Interfaces;
+using App.RM.Domain.Entities;
+using App.RM.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.Infrastructure.Services;
+namespace App.RM.Infrastructure.Services;
 
 public class AuthenticateUserService(
         AppDbContext context, 

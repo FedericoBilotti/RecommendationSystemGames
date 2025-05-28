@@ -1,4 +1,4 @@
-namespace App.Application.Dtos;
+namespace App.RM.Application.Dtos;
 
 public class UserRequestDto
 {

@@ -1,8 +1,8 @@
-using App.Application.Dtos;
-using App.Application.Interfaces;
-using App.Domain.Entities;
+using App.RM.Application.Dtos;
+using App.RM.Application.Interfaces;
+using App.RM.Domain.Entities;
 
-namespace App.Application.UseCases;
+namespace App.RM.Application.UseCases;
 
 public class AuthTokenUseCase(ITokenService tokenService)
 {

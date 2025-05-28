@@ -1,7 +1,7 @@
-using App.Application.Dtos;
-using App.Domain.Entities;
+using App.RM.Application.Dtos;
+using App.RM.Domain.Entities;
 
-namespace App.Application.Interfaces;
+namespace App.RM.Application.Interfaces;
 
 public interface IAuthenticateUserUseCase
 {

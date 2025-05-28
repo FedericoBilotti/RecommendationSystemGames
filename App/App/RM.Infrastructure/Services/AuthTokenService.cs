@@ -2,13 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using App.Application.Dtos;
-using App.Application.Interfaces;
-using App.Domain.Entities;
-using App.Infrastructure.Database;
+using App.RM.Application.Dtos;
+using App.RM.Application.Interfaces;
+using App.RM.Domain.Entities;
+using App.RM.Infrastructure.Database;
 using Microsoft.IdentityModel.Tokens;
 
-namespace App.Infrastructure.Services;
+namespace App.RM.Infrastructure.Services;
 
 public class AuthTokenService(AppDbContext context, IUserRepository userRepository, IConfiguration configuration) : ITokenService
 {

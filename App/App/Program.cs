@@ -1,10 +1,10 @@
 using System.Text;
-using App.Application.Interfaces;
-using App.Application.UseCases;
-using App.Domain.Entities;
-using App.Infrastructure.Data;
-using App.Infrastructure.Database;
-using App.Infrastructure.Services;
+using App.RM.Application.Interfaces;
+using App.RM.Application.UseCases;
+using App.RM.Domain.Entities;
+using App.RM.Infrastructure.Data;
+using App.RM.Infrastructure.Database;
+using App.RM.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

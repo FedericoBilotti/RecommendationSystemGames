@@ -1,7 +1,7 @@
-using App.Domain.Entities;
+using App.RM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Infrastructure.Database;
+namespace App.RM.Infrastructure.Database;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
