@@ -7,6 +7,7 @@ using App.RM.Domain.Entities;
 using App.RM.Infrastructure.Data;
 using App.RM.Infrastructure.Database;
 using App.RM.Infrastructure.Services;
+using App.RM.Infrastructure.Services.Authenticate;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
