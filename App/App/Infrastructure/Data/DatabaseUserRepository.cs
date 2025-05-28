@@ -1,11 +1,10 @@
 using App.Application.Dtos;
 using App.Application.Interfaces;
-using App.Application.UseCases;
 using App.Domain.Entities;
 using App.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace App.Application.Data;
+namespace App.Infrastructure.Data;
 
 public class DatabaseUserRepository : IUserRepository
 {
