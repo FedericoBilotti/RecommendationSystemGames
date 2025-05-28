@@ -5,7 +5,7 @@ using App.RM.Domain.Entities;
 using App.RM.Infrastructure.Database;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.RM.Infrastructure.Services;
+namespace App.RM.Infrastructure.Services.Authenticate;
 
 public class AuthenticateUserService(
         AppDbContext context, 
