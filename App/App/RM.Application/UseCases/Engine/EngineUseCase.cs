@@ -3,17 +3,10 @@ using App.RM.Application.Interfaces.Engine;
 
 namespace App.RM.Application.UseCases.Engine;
 
-public class EngineUseCase : IEngineUseCase
+public class EngineUseCase(IEngine engine) : IEngineUseCase
 {
-    private readonly IEngine _engine;
-    
-    public EngineUseCase(IEngine engine)
-    {
-        _engine = engine;
-    }
-
     public async Task<GameGenreFilterResponseDto?> GetGamesByGenreAsync(GameGenreFilterRequestDto gameGenresRequestDto)
     {
-        return await _engine.GetGamesByGenreAsync(gameGenresRequestDto);
+        return await engine.GetGamesByGenreAsync(gameGenresRequestDto);
     }
 }
