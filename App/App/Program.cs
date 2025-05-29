@@ -59,7 +59,6 @@ builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase, AuthenticateUserUseCase>();
 
 // Engine
-
 builder.Services.Configure<RawgApiSettings>(options => options.RawgApikey = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
 builder.Services.AddHttpClient<IEngine, EngineService>();
 builder.Services.AddScoped<IDeserializer, JsonDeserializerService>();

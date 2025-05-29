@@ -2,15 +2,17 @@ using System.Text.Json;
 using App.RM.Application.Dtos.Engine;
 using App.RM.Application.Interfaces;
 using App.RM.Application.Interfaces.Engine;
-using Sprache;
+using Microsoft.Extensions.Options;
 
 namespace App.RM.Infrastructure.Services.Engine;
 
-public class EngineService(IDeserializer deserializer, HttpClient http, IOption<RawgApiSettings> rawgApiSettings) : IEngine
+public class EngineService(IDeserializer deserializer, HttpClient http, IOptions<RawgApiSettings> rawgApiSettings) : IEngine
 {
+    private readonly RawgApiSettings _rawgApiSettings = rawgApiSettings.Value;
+    
     public async Task<GameGenreFilterResponseDto?> GetGamesByGenreAsync(GameGenreFilterRequestDto gameGenreFilterRequestDto)
     {
-        var uri = $"games?key={rawgApiSettings.Get().RawgApikey}&genres={gameGenreFilterRequestDto.genre}&page={gameGenreFilterRequestDto.limit}";
+        var uri = $"games?key={_rawgApiSettings.RawgApikey}&genres={gameGenreFilterRequestDto.genre}&page={gameGenreFilterRequestDto.limit}";
         return await GetAsync<GameGenreFilterResponseDto>(uri);
     }
 
