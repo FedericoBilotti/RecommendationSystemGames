@@ -9,10 +9,17 @@ namespace App.RM.Infrastructure.Services.Engine;
 public class EngineService(IDeserializer deserializer, HttpClient http, IOptions<RawgApiSettings> rawgApiSettings) : IEngine
 {
     private readonly RawgApiSettings _rawgApiSettings = rawgApiSettings.Value;
-    
-    public async Task<GameGenreFilterResponseDto?> GetGamesByGenreAsync(GameGenreFilterRequestDto gameGenreFilterRequestDto)
+
+    public async Task<GameGenreFilterResponseDto?> GetGamesByGenreAsync(GameGenreFilterRequestDto requestDto)
     {
-        var uri = $"games?key={_rawgApiSettings.RawgApikey}&genres={gameGenreFilterRequestDto.genre}&page={gameGenreFilterRequestDto.limit}";
+        string? apiKey = _rawgApiSettings.RawgApikey;
+
+        if (apiKey == null)
+        {
+            throw new ArgumentNullException(apiKey, "RAWG_APIKEY environment variable is not set");
+        }
+        
+        var uri = $"https://api.rawg.io/api/games?key={apiKey}&genres={requestDto.genre}&page_size={requestDto.limit}";
         return await GetAsync<GameGenreFilterResponseDto>(uri);
     }
 
