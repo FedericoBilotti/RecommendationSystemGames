@@ -23,6 +23,7 @@ public class AuthenticateUserService(
         string hashedPassword = hasher.HashPassword(user, requestUserRequestDto.Password);
         user.Username = requestUserRequestDto.Username;
         user.HashedPassword = hashedPassword;
+        user.Email = requestUserRequestDto.Email;
 
         context.Users.Add(user);
         await context.SaveChangesAsync();

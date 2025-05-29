@@ -1,14 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace App.RM.Domain.Entities;
 
 public class User
 {
-    [Key] public Guid UserId { get; set; }
-    [StringLength(255)] public string Email { get; set; } = string.Empty;
-    [StringLength(100)] public string Username { get; set; } = string.Empty;
-    [StringLength(100)] public string HashedPassword { get; set; } = string.Empty;
-    [StringLength(15)] public string Role { get; set; } = string.Empty;
+    public Guid UserId { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string HashedPassword { get; set; } = string.Empty;
+    public string Role { get; set; } = string.Empty;
     
     public ICollection<Game> FavoriteGames { get; set; } = [];
     
