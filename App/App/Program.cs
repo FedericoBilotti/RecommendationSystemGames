@@ -76,7 +76,13 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "RecommendationSystemGames";
+        options.Theme = ScalarTheme.Moon;
+        options.Layout = ScalarLayout.Modern;
+        options.HideClientButton = true;
+    });
 }
 
 app.UseHttpsRedirection();

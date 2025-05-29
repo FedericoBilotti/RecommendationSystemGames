@@ -10,7 +10,7 @@ public class GenreController(IEngineUseCase engineUseCase) : ControllerBase
 {
     // [Authorize]
     [HttpGet("Filter")]
-    public async Task<ActionResult<GameGenreFilterResponseDto>> FilterGenres([FromQuery] GameGenreFilterRequestDto gameGenresName)
+    public async Task<ActionResult<GameGenreFilterResponseDto>> FilterGenres(GameGenreFilterRequestDto gameGenresName)
     {
         GameGenreFilterResponseDto? games = await engineUseCase.GetGamesByGenreAsync(gameGenresName);
         
