@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 using App;
 using App.RM.Application.Interfaces;
 using App.RM.Application.Interfaces.Authentication;
@@ -61,8 +60,8 @@ builder.Services.AddScoped<AuthenticateUserUseCase, AuthenticateUserUseCase>();
 
 // Engine
 
-builder.Services.Configure<ApiSettings>(options => options.RAWG_APIKEY = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
-builder.Services.AddHttpClient();
+builder.Services.Configure<RawgApiSettings>(options => options.RawgApikey = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
+builder.Services.AddHttpClient<IEngine, EngineService>();
 builder.Services.AddScoped<IDeserializer, JsonDeserializerService>();
 builder.Services.AddScoped<IEngine, EngineService>();
 builder.Services.AddScoped<IEngineUseCase, EngineUseCase>();
