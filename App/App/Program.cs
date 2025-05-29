@@ -11,6 +11,7 @@ using App.RM.Infrastructure.Database;
 using App.RM.Infrastructure.Services;
 using App.RM.Infrastructure.Services.Authenticate;
 using App.RM.Infrastructure.Services.Engine;
+using App.StartUp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,48 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApi();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase"));
-});
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = builder.Configuration["AppSettings:Issuer"],
-                ValidateAudience = true,
-                ValidAudience = builder.Configuration["AppSettings:Audience"],
-                ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
-                ValidateIssuerSigningKey = true
-            };
-        });
-
-Env.Load();
-
-// Database
-builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
-
-// Authentication 
-builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
-builder.Services.AddScoped<ITokenService, AuthTokenService>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
-// Tokenization
-builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
-builder.Services.AddScoped<AuthenticateUserUseCase, AuthenticateUserUseCase>();
-
-// Engine
-builder.Services.Configure<RawgApiSettings>(options => options.RawgApikey = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
-builder.Services.AddHttpClient<IEngine, EngineService>();
-builder.Services.AddScoped<IDeserializer, JsonDeserializerService>();
-builder.Services.AddScoped<IEngine, EngineService>();
-builder.Services.AddScoped<IEngineUseCase, EngineUseCase>();
+builder.AddDependencies();
 
 var app = builder.Build();
 
@@ -73,17 +33,7 @@ using (var scope = app.Services.CreateScope())
     services.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference(options =>
-    {
-        options.Title = "RecommendationSystemGames";
-        options.Theme = ScalarTheme.Moon;
-        options.Layout = ScalarLayout.Modern;
-        options.HideClientButton = true;
-    });
-}
+app.UseOpenApi();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

@@ -9,7 +9,7 @@ namespace App.RM.Presentation.Controllers.Engine;
 public class GenreController(IEngineUseCase engineUseCase) : ControllerBase
 {
     // [Authorize]
-    [HttpGet("Filter")]
+    [HttpPost("Filter")]
     public async Task<ActionResult<GameGenreFilterResponseDto>> FilterGenres(GameGenreFilterRequestDto gameGenresName)
     {
         GameGenreFilterResponseDto? games = await engineUseCase.GetGamesByGenreAsync(gameGenresName);
