@@ -9,7 +9,7 @@ using RM.Infrastructure.Database;
 
 #nullable disable
 
-namespace App.Migrations
+namespace RM.Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20250529180411_tables")]

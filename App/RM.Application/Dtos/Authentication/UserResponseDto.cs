@@ -1,4 +1,4 @@
-namespace App.RM.Application.Dtos.Authentication;
+namespace App.Dtos.Authentication;
 
 public class UserResponseDto
 {

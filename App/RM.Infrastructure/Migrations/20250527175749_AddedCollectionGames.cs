@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace App.Migrations
+namespace RM.Application.Migrations
 {
     /// <inheritdoc />
     public partial class AddedCollectionGames : Migration

@@ -1,28 +1,23 @@
+using App.Dtos.Authentication;
 using App.Interfaces;
 using App.Interfaces.Authentication;
-using App.RM.Application.Dtos.Authentication;
+using App.Mappers;
 using Microsoft.AspNetCore.Identity;
 using RM.Domain.Entities;
 
 namespace App.Services.Authenticate;
 
-public class AuthenticateUserService(
-        IUserRepository context, // Pedir el user repository
-        IUserRepository userRepository, 
-        IPasswordHasher<User> hasher, 
-        ITokenService tokens) 
-        : IAuthService
+public class AuthenticateUserService(IUserRepository userRepository, IPasswordHasher<User> hasher, ITokenService tokens) : IAuthService
 {
     public async Task<User?> RegisterAsync(UserRequestDto requestUserRequestDto)
     {
-        if (await userRepository.GetUserByUsername(requestUserRequestDto) != null) return null;
+        User user = requestUserRequestDto.MapToUserExists();
+        
+        bool isValid = await userRepository.GetUserByUsername(user) != null;
+        
+        if (isValid) return null; // Throw an error
 
-        var user = new User();
-
-        string hashedPassword = hasher.HashPassword(user, requestUserRequestDto.Password);
-        user.Username = requestUserRequestDto.Username;
-        user.HashedPassword = hashedPassword;
-        user.Email = requestUserRequestDto.Email;
+        user.MapToUserRegister(hasher, requestUserRequestDto.Password);
 
         // context.Users.Add(user); // Debería hacerlo el repositorio.
         // await context.SaveChangesAsync();
@@ -32,7 +27,7 @@ public class AuthenticateUserService(
 
     public async Task<TokenResponseDto?> LoginAsync(UserRequestDto requestUserRequestDto)
     {
-        User? user = await userRepository.GetUserByUsername(requestUserRequestDto);
+        User? user = await userRepository.GetUserByUsername(requestUserRequestDto.MapToUserExists());
 
         if (user == null) return null;
 

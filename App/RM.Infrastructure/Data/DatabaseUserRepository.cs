@@ -1,5 +1,4 @@
 using App.Interfaces;
-using App.RM.Application.Dtos.Authentication;
 using Microsoft.EntityFrameworkCore;
 using RM.Domain.Entities;
 using RM.Infrastructure.Database;
@@ -13,7 +12,7 @@ public class DatabaseUserRepository(AppDbContext context) : IUserRepository
         return await context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
-    public async Task<User?> GetUserByUsername(UserRequestDto requestUserRequestDto)
+    public async Task<User?> GetUserByUsername(User requestUserRequestDto)
     {
         string usernameLower = requestUserRequestDto.Username.ToLower();
         return await context.Users.FirstOrDefaultAsync(u => u.Username == usernameLower);

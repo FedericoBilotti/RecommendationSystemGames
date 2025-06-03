@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace App.Migrations
+namespace RM.Application.Migrations
 {
     /// <inheritdoc />
     public partial class tables : Migration

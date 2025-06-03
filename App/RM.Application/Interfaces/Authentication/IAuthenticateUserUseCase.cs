@@ -1,4 +1,4 @@
-using App.RM.Application.Dtos.Authentication;
+using App.Dtos.Authentication;
 using RM.Domain.Entities;
 
 namespace App.Interfaces.Authentication;

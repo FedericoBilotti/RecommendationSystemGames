@@ -1,4 +1,4 @@
-namespace App;
+namespace RM.Application;
 
 public class RawgApiSettings
 {
