@@ -10,11 +10,15 @@ public static class ApiEndpoints
         
         public static class Games
         {
-            public const string CREATE = $"{V1_BASE}/Games/Create";
+            private const string BASE = $"{V1_BASE}/Games";
             
-            public const string FILTER = $"{V1_BASE}/Games/Filter";
-            public const string FILTER_GENRES = $"{V1_BASE}/Games/FilterGenres";
-            public const string FILTER_DEVELOPERS = $"{V1_BASE}/Games/FilterDevelopers";
+            public const string CREATE = $"{BASE}";
+            public const string GET_ALL = $"{BASE}";
+            public const string GET = $"{BASE}/{{id:guid}}";
+            
+            // public const string FILTER = $"{V1_BASE}/Games/Filter";
+            // public const string FILTER_GENRES = $"{V1_BASE}/Games/FilterGenres";
+            // public const string FILTER_DEVELOPERS = $"{V1_BASE}/Games/FilterDevelopers";
         }    
     }
 }

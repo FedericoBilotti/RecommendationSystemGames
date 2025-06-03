@@ -23,8 +23,32 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
             return BadRequest("Game already exists");
         }
         
-        GameResponseDto gameResponseDto = game.MapToGameResponseDto();
-        return Created($"{ApiEndpoints.V1.Games.CREATE}/{game.GameId}", gameResponseDto);
+        GameResponseDto gameResponse = game.MapToResponse();
+        return Created($"{ApiEndpoints.V1.Games.CREATE}/{game.GameId}", gameResponse);
+    }
+
+    [HttpGet(ApiEndpoints.V1.Games.GET)]
+    public async Task<ActionResult<GameFilterResponseDto>> Create([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    {
+        Game? game = await gamesRepository.GetByIdAsync(id, cancellationToken);
+        
+        if (game == null)
+        {
+            return NotFound("Game not found");
+        }
+        
+        GameResponseDto gameResponse = game.MapToResponse();
+        return Ok(gameResponse);
+    }
+    
+    [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
+    public async Task<ActionResult<GameFilterResponseDto>> Create(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Game> game = await gamesRepository.GetAllAsync(cancellationToken);
+        
+        GamesResponseDto gameResponse = game.MapToResponse();
+        
+        return Ok(gameResponse);
     }
     
     /*

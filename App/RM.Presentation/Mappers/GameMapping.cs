@@ -10,6 +10,7 @@ public static class GameMapping
     {
         return new Game
         {
+            GameId = Guid.NewGuid(),
             Title = createGameRequestDto.Title,
             Description = createGameRequestDto.Description,
             YearOfRelease = createGameRequestDto.YearOfRelease,
@@ -17,7 +18,7 @@ public static class GameMapping
         };
     }
 
-    public static GameResponseDto MapToGameResponseDto(this Game game)
+    public static GameResponseDto MapToResponse(this Game game)
     {
         return new GameResponseDto
         {
@@ -26,6 +27,14 @@ public static class GameMapping
             Description = game.Description,
             YearOfRelease = game.YearOfRelease,
             Genre = game.Genres.Select(g => g.Name).ToList()
+        };
+    }
+    
+    public static GamesResponseDto MapToResponse(this IEnumerable<Game> game)
+    {
+        return new GamesResponseDto
+        {
+            GamesResponseDtos = game.Select(g => g.MapToResponse()).ToList()
         };
     }
 }

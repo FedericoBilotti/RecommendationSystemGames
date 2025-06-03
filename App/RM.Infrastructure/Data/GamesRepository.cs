@@ -25,7 +25,7 @@ public class GamesRepository : IGamesRepository
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Game>> GetAllAsync()
+    public Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
