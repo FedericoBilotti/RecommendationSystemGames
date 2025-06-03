@@ -1,8 +1,8 @@
-using App.RM.Application.Dtos.Engine;
-using App.RM.Application.Dtos.Engine.Genre;
-using App.RM.Application.Dtos.Engine.Developers;
+using App.Dtos.Engine;
+using App.Dtos.Engine.Developers;
+using App.Dtos.Engine.Genre;
 
-namespace App.RM.Application.Interfaces.Engine;
+namespace App.Interfaces.Engine;
 
 public interface IEngine
 {

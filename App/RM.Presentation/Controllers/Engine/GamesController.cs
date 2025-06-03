@@ -1,10 +1,10 @@
-using App.RM.Application.Dtos.Engine;
-using App.RM.Application.Dtos.Engine.Developers;
-using App.RM.Application.Dtos.Engine.Genre;
-using App.RM.Application.Interfaces.Engine;
+using App.Dtos.Engine;
+using App.Dtos.Engine.Developers;
+using App.Dtos.Engine.Genre;
+using App.Interfaces.Engine;
 using Microsoft.AspNetCore.Mvc;
 
-namespace App.RM.Presentation.Controllers.Engine;
+namespace RM.Presentation.Controllers.Engine;
 
 [Route("api/v1/[controller]")]
 [ApiController]

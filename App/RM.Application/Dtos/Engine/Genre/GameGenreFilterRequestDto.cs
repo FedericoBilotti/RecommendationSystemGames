@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace App.RM.Application.Dtos.Engine.Genre;
+namespace App.Dtos.Engine.Genre;
 
 public class GameGenreFilterRequestDto
 {

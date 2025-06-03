@@ -1,12 +1,11 @@
 using System.Text.Json;
-using App.RM.Application.Dtos.Engine;
-using App.RM.Application.Dtos.Engine.Developers;
-using App.RM.Application.Dtos.Engine.Genre;
+using App.Dtos.Engine;
+using App.Dtos.Engine.Developers;
+using App.Dtos.Engine.Genre;
+using App.Interfaces.Engine;
 using App.RM.Application.Interfaces;
-using App.RM.Application.Interfaces.Engine;
-using Microsoft.Extensions.Options;
 
-namespace App.RM.Infrastructure.Services.Engine;
+namespace App.Services.Engine;
 
 public class EngineService(IDeserializer deserializer, HttpClient http) : IEngine
 {

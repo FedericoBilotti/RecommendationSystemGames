@@ -1,5 +1,5 @@
 using App.RM.Application.Dtos.Authentication;
-using App.RM.Domain.Entities;
+using RM.Domain.Entities;
 
 namespace App.RM.Application.Interfaces;
 

@@ -1,6 +1,6 @@
-using App.RM.Application.Dtos.Engine.Genre;
+using App.Dtos.Engine.Genre;
 
-namespace App.RM.Application.Dtos.Engine;
+namespace App.Dtos.Engine;
 
 public class GameFilterResponseDto
 {

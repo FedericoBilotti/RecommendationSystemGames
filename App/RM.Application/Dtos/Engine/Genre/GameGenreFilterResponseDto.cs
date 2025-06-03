@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace App.RM.Application.Dtos.Engine.Genre;
+namespace App.Dtos.Engine.Genre;
 
 public class GameGenreFilterResponseDto
 {

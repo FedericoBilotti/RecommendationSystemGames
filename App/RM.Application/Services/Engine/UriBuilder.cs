@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace App.RM.Infrastructure.Services.Engine;
+namespace App.Services.Engine;
 
 public class RawgUriBuilder(string baseUri, string apiKey, string middle = "games")
 {

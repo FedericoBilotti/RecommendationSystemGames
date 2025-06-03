@@ -1,10 +1,10 @@
+using App.Interfaces.Authentication;
 using App.RM.Application.Dtos.Authentication;
-using App.RM.Application.Interfaces.Authentication;
-using App.RM.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RM.Domain.Entities;
 
-namespace App.RM.Presentation.Controllers.Authentication;
+namespace RM.Presentation.Controllers.Authentication;
 
 [Route("[controller]")]
 [ApiController]

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using App.RM.Application.Dtos.Engine.Genre;
+using App.Dtos.Engine.Genre;
 
-namespace App.RM.Application.Dtos.Engine.Developers;
+namespace App.Dtos.Engine.Developers;
 
 public class GameDevelopersFilterResponseDto
 {

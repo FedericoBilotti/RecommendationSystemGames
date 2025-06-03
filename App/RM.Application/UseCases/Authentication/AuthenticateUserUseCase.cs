@@ -1,10 +1,8 @@
-using App.RM.Application.Dtos;
+using App.Interfaces.Authentication;
 using App.RM.Application.Dtos.Authentication;
-using App.RM.Application.Interfaces;
-using App.RM.Application.Interfaces.Authentication;
-using App.RM.Domain.Entities;
+using RM.Domain.Entities;
 
-namespace App.RM.Application.UseCases.Authentication;
+namespace App.UseCases.Authentication;
 
 public class AuthenticateUserUseCase(IAuthService authService, ITokenService tokenService) : IAuthenticateUserUseCase
 {

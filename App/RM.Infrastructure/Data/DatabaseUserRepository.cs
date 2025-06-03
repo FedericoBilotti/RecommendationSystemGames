@@ -1,7 +1,7 @@
 using App.RM.Application.Dtos.Authentication;
 using App.RM.Application.Interfaces;
-using App.RM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using RM.Domain.Entities;
 using RM.Infrastructure.Database;
 
 namespace RM.Infrastructure.Data;

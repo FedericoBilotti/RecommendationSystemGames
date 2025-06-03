@@ -23,10 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Application\Dtos\Engine\Rating\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\RM.Domain\RM.Domain.csproj" />
     </ItemGroup>
 

@@ -2,12 +2,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using App.Interfaces.Authentication;
 using App.RM.Application.Dtos.Authentication;
 using App.RM.Application.Interfaces;
-using App.RM.Application.Interfaces.Authentication;
-using App.RM.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using RM.Domain.Entities;
 
 namespace App.Services.Authenticate;
 

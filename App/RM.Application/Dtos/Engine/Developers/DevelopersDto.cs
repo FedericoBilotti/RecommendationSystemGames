@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace App.RM.Application.Dtos.Engine.Developers;
+namespace App.Dtos.Engine.Developers;
 
 public class DevelopersDto
 {

@@ -1,10 +1,10 @@
+using App.Interfaces.Authentication;
 using App.RM.Application.Dtos.Authentication;
 using App.RM.Application.Interfaces;
-using App.RM.Application.Interfaces.Authentication;
-using App.RM.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using RM.Domain.Entities;
 
-namespace App.RM.Infrastructure.Services.Authenticate;
+namespace App.Services.Authenticate;
 
 public class AuthenticateUserService(
         IUserRepository context, // Pedir el user repository

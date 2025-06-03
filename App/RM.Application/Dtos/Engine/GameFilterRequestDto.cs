@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace App.RM.Application.Dtos.Engine;
+namespace App.Dtos.Engine;
 
 public class GameFilterRequestDto
 {

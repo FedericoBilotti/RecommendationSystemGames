@@ -1,5 +1,5 @@
-using App.RM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using RM.Domain.Entities;
 
 namespace RM.Infrastructure.Database;
 

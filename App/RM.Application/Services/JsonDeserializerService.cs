@@ -1,7 +1,7 @@
 using System.Text.Json;
 using App.RM.Application.Interfaces;
 
-namespace App.RM.Infrastructure.Services;
+namespace App.Services;
 
 public class JsonDeserializerService : IDeserializer
 {

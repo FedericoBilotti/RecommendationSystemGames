@@ -1,9 +1,9 @@
-using App.RM.Application.Dtos.Engine;
-using App.RM.Application.Dtos.Engine.Developers;
-using App.RM.Application.Dtos.Engine.Genre;
-using App.RM.Application.Interfaces.Engine;
+using App.Dtos.Engine;
+using App.Dtos.Engine.Developers;
+using App.Dtos.Engine.Genre;
+using App.Interfaces.Engine;
 
-namespace App.RM.Application.UseCases.Engine;
+namespace App.UseCases.Engine;
 
 public class EngineUseCase(IEngine engine) : IEngineUseCase
 {
