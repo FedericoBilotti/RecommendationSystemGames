@@ -22,32 +22,34 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
         {
             return BadRequest("Game already exists");
         }
-        
+
         GameResponseDto gameResponse = game.MapToResponse();
         return CreatedAtAction(nameof(Get), new { id = game.GameId }, gameResponse);
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET)]
-    public async Task<ActionResult<GameFilterResponseDto>> Get([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameFilterResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
-        Game? game = await gamesRepository.GetByIdAsync(id, cancellationToken);
-        
+        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) 
+                ? await gamesRepository.GetByIdAsync(gameId, cancellationToken) 
+                : await gamesRepository.GetBySlugAsync(idOrSlug, cancellationToken);
+
         if (game == null)
         {
             return NotFound("Game not found");
         }
-        
+
         GameResponseDto gameResponse = game.MapToResponse();
         return Ok(gameResponse);
     }
-    
+
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
     public async Task<ActionResult<GameFilterResponseDto>> GetAll(CancellationToken cancellationToken = default)
     {
         IEnumerable<Game> game = await gamesRepository.GetAllAsync(cancellationToken);
-        
+
         GamesResponseDto gameResponse = game.MapToResponse();
-        
+
         return Ok(gameResponse);
     }
 
@@ -55,9 +57,9 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
     public async Task<ActionResult<GameFilterResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
     {
         Game game = updateGameRequest.MapToGame(id);
-        
+
         bool wasUpdated = await gamesRepository.UpdateAsync(game, cancellationToken);
-        
+
         if (!wasUpdated)
         {
             return NotFound("Game not found");
@@ -66,9 +68,9 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
         GameResponseDto gameResponse = game.MapToResponse();
         return Ok(gameResponse);
     }
-    
+
     [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
-    public async Task<ActionResult<GameFilterResponseDto>> Delete([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameFilterResponseDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         bool wasDeleted = await gamesRepository.DeleteByIdAsync(id, cancellationToken);
 

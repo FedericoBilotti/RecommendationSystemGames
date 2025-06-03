@@ -15,6 +15,11 @@ public class GamesRepository : IGamesRepository
         throw new NotImplementedException();
     }
 
+    public Task<Game?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<bool> UpdateAsync(Game game, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
