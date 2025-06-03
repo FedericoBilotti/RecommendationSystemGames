@@ -1,6 +1,6 @@
+using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.RM.Application.Dtos.Authentication;
-using App.RM.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using RM.Domain.Entities;
 

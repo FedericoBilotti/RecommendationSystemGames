@@ -1,5 +1,5 @@
 using System.Text.Json;
-using App.RM.Application.Interfaces;
+using App.Interfaces;
 
 namespace App.Services;
 

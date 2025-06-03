@@ -1,7 +1,7 @@
 using App.RM.Application.Dtos.Authentication;
 using RM.Domain.Entities;
 
-namespace App.RM.Application.Interfaces;
+namespace App.Interfaces;
 
 public interface IUserRepository
 {

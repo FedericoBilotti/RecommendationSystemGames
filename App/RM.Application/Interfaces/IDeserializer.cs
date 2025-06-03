@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace App.RM.Application.Interfaces;
+namespace App.Interfaces;
 
 public interface IDeserializer
 {
