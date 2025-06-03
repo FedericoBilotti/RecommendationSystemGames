@@ -3,14 +3,14 @@ using App.RM.Application.Dtos.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RM.Domain.Entities;
+using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Authentication;
 
-[Route("[controller]")]
 [ApiController]
 public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBase
 {
-    [HttpPost("register")]
+    [HttpPost(AuthEndpoints.Auth.REGISTER)]
     public async Task<ActionResult<User>> Register(UserRequestDto requestUserRequestDto)
     {
         User? user = await authUseCase.RegisterAsync(requestUserRequestDto);
@@ -23,7 +23,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return Ok(user);
     }
 
-    [HttpPost("login")]
+    [HttpPost(AuthEndpoints.Auth.LOGIN)]
     public async Task<ActionResult<string>> Login(UserRequestDto requestUserRequestDto)
     {
         TokenResponseDto? tokenResult = await authUseCase.LoginAsync(requestUserRequestDto);
@@ -36,7 +36,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return Ok(tokenResult);
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
     public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
     {
         TokenResponseDto? result = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto);

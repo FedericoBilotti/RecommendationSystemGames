@@ -3,14 +3,14 @@ using App.Dtos.Engine.Developers;
 using App.Dtos.Engine.Genre;
 using App.Interfaces.Engine;
 using Microsoft.AspNetCore.Mvc;
+using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Engine;
 
-[Route("api/v1/[controller]")]
 [ApiController]
 public class GamesController(IEngineUseCase engineUseCase) : ControllerBase
 {
-    [HttpPost("Filter")]
+    [HttpPost(ApiEndpoints.V1.Games.FILTER)]
     public async Task<ActionResult<GameFilterResponseDto>> Filter(GameFilterRequestDto requestDto)
     {
         GameFilterResponseDto? responseDto = await engineUseCase.GetGamesByFiltersAsync(requestDto);
@@ -24,7 +24,7 @@ public class GamesController(IEngineUseCase engineUseCase) : ControllerBase
     }
     
     // [Authorize]
-    [HttpPost("Genre/Filter")]
+    [HttpPost(ApiEndpoints.V1.Games.FILTER_GENRES)]
     public async Task<ActionResult<GameGenreFilterResponseDto>> FilterGenres(GameGenreFilterRequestDto gameGenresName)
     {
         GameGenreFilterResponseDto? games = await engineUseCase.GetGamesByGenreAsync(gameGenresName);
@@ -38,7 +38,7 @@ public class GamesController(IEngineUseCase engineUseCase) : ControllerBase
     }
     
     // [Authorize]
-    [HttpPost("Developers/Filter")]
+    [HttpPost(ApiEndpoints.V1.Games.FILTER_DEVELOPERS)]
     public async Task<ActionResult<GameDevelopersFilterResponseDto>> FilterDevelopers(GameDevelopersFilterRequestDto requestDto)
     {
         GameDevelopersFilterResponseDto? developers = await engineUseCase.GetGamesByDeveloperAsync(requestDto);
