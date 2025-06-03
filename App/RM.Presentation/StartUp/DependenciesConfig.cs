@@ -44,7 +44,7 @@ public static class DependenciesConfig
 
         // Database
         builder.Services.AddDbContext<AppDbContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")); });
-        builder.Services.AddScoped<IUserRepository, DatabaseUserRepository>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
 
         // Authentication 
         builder.Services.AddScoped<IAuthService, AuthenticateUserService>();

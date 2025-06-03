@@ -5,7 +5,7 @@ using RM.Infrastructure.Database;
 
 namespace RM.Infrastructure.Data;
 
-public class DatabaseUserRepository(AppDbContext context) : IUserRepository
+public class UserRepository(AppDbContext context) : IUserRepository
 {
     public async Task<User?> GetUserById(Guid userId)
     {
