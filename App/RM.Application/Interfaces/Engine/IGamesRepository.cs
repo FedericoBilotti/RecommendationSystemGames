@@ -1,6 +1,12 @@
+using RM.Domain.Entities.Games;
+
 namespace App.Interfaces.Engine;
 
-public class IGamesRepository 
+public interface IGamesRepository 
 {
-    
+    Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default);
+    Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
+    Task<bool> UpdateAsync(Game game, CancellationToken cancellationToken = default);
+    Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Game>> GetAllAsync();
 }

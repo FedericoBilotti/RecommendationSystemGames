@@ -10,6 +10,8 @@ public static class ApiEndpoints
         
         public static class Games
         {
+            public const string CREATE = $"{V1_BASE}/Games/Create";
+            
             public const string FILTER = $"{V1_BASE}/Games/Filter";
             public const string FILTER_GENRES = $"{V1_BASE}/Games/FilterGenres";
             public const string FILTER_DEVELOPERS = $"{V1_BASE}/Games/FilterDevelopers";

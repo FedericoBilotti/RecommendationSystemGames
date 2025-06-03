@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RM.Domain.Entities;
+using RM.Domain.Entities.Games;
 
 namespace RM.Infrastructure.Database;
 

@@ -1,6 +1,8 @@
 using App.Dtos.Engine;
 using App.Dtos.Engine.Developers;
 using App.Dtos.Engine.Genre;
+using App.Dtos.Games;
+using App.Dtos.Games.Requests;
 using App.Interfaces.Engine;
 using Microsoft.AspNetCore.Mvc;
 using RM.Presentation.Routes;
@@ -8,8 +10,15 @@ using RM.Presentation.Routes;
 namespace RM.Presentation.Controllers.Engine;
 
 [ApiController]
-public class GamesController(IEngineUseCase engineUseCase) : ControllerBase
+public class GamesController(IGamesRepository gamesRepository) : ControllerBase
 {
+    [HttpPost(ApiEndpoints.V1.Games.CREATE)]
+    public async Task<ActionResult<GameFilterResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest)
+    {
+        
+    }
+    
+    /*
     [HttpPost(ApiEndpoints.V1.Games.FILTER)]
     public async Task<ActionResult<GameFilterResponseDto>> Filter(GameFilterRequestDto requestDto)
     {
@@ -50,6 +59,7 @@ public class GamesController(IEngineUseCase engineUseCase) : ControllerBase
         
         return Ok(developers);
     }
+    */
 
 
 }
