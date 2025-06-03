@@ -20,7 +20,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
             return BadRequest("User already exists");
         }
 
-        return Ok(user);
+        return Created($"{AuthEndpoints.Auth.REGISTER}/{user.UserId}", user);
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
