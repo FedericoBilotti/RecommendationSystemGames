@@ -1,23 +1,28 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["App/App.csproj", "App/"]
-RUN dotnet restore "App/App.csproj"
+
+COPY ["RM.Presentation/RM.Presentation.csproj", "RM.Presentation/"]
+COPY ["RM.Application/RM.Application.csproj", "RM.Application/"]
+COPY ["RM.Domain/RM.Domain.csproj", "RM.Domain/"]
+COPY ["RM.Infrastructure/RM.Infrastructure.csproj", "RM.Infrastructure/"]
+
+RUN dotnet restore "RM.Presentation/RM.Presentation.csproj"
+
 COPY . .
-WORKDIR "/src/App"
-RUN dotnet build "App.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+WORKDIR "/src/RM.Presentation"
+RUN dotnet build "RM.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "App.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "RM.Presentation.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "App.dll"]
+ENTRYPOINT ["dotnet", "RM.Presentation.dll"]
