@@ -1,10 +1,10 @@
 using App.Dtos.Engine;
-using App.Dtos.Engine.Developers;
-using App.Dtos.Engine.Genre;
-using App.Dtos.Games;
 using App.Dtos.Games.Requests;
+using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
 using Microsoft.AspNetCore.Mvc;
+using RM.Domain.Entities.Games;
+using RM.Presentation.Mappers;
 using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Engine;
@@ -13,9 +13,18 @@ namespace RM.Presentation.Controllers.Engine;
 public class GamesController(IGamesRepository gamesRepository) : ControllerBase
 {
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
-    public async Task<ActionResult<GameFilterResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest)
+    public async Task<ActionResult<GameFilterResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
+        Game game = createGameRequest.MapToGame();
+        bool wasCreated = await gamesRepository.CreateAsync(game, cancellationToken);
+
+        if (!wasCreated)
+        {
+            return BadRequest("Game already exists");
+        }
         
+        GameResponseDto gameResponseDto = game.MapToGameResponseDto();
+        return Created($"{ApiEndpoints.V1.Games.CREATE}/{game.GameId}", gameResponseDto);
     }
     
     /*

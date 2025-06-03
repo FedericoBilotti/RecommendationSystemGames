@@ -2,9 +2,9 @@ using App.Dtos.Authentication;
 using Microsoft.AspNetCore.Identity;
 using RM.Domain.Entities;
 
-namespace App.Mappers;
+namespace RM.Presentation.Mappers;
 
-public static class ContractMapping
+public static class UserMapping
 {
     public static User MapToUserRegister(this User user, IPasswordHasher<User> hasher, string password)
     {
