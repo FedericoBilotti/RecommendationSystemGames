@@ -79,47 +79,4 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
 
         return Ok();
     }
-    
-    /*
-    [HttpPost(ApiEndpoints.V1.Games.FILTER)]
-    public async Task<ActionResult<GameFilterResponseDto>> Filter(GameFilterRequestDto requestDto)
-    {
-        GameFilterResponseDto? responseDto = await engineUseCase.GetGamesByFiltersAsync(requestDto);
-        
-        if (responseDto == null)
-        {
-            return NotFound("No developers found");
-        }
-        
-        return Ok(responseDto);
-    }
-    
-    // [Authorize]
-    [HttpPost(ApiEndpoints.V1.Games.FILTER_GENRES)]
-    public async Task<ActionResult<GameGenreFilterResponseDto>> FilterGenres(GameGenreFilterRequestDto gameGenresName)
-    {
-        GameGenreFilterResponseDto? games = await engineUseCase.GetGamesByGenreAsync(gameGenresName);
-        
-        if (games == null)
-        {
-            return NotFound("No games found");
-        }
-        
-        return Ok(games);
-    }
-    
-    // [Authorize]
-    [HttpPost(ApiEndpoints.V1.Games.FILTER_DEVELOPERS)]
-    public async Task<ActionResult<GameDevelopersFilterResponseDto>> FilterDevelopers(GameDevelopersFilterRequestDto requestDto)
-    {
-        GameDevelopersFilterResponseDto? developers = await engineUseCase.GetGamesByDeveloperAsync(requestDto);
-        
-        if (developers == null)
-        {
-            return NotFound("No developers found");
-        }
-        
-        return Ok(developers);
-    }
-    */
 }
