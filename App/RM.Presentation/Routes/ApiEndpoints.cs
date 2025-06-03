@@ -15,6 +15,7 @@ public static class ApiEndpoints
             public const string CREATE = $"{BASE}";
             public const string GET_ALL = $"{BASE}";
             public const string GET = $"{BASE}/{{id:guid}}";
+            public const string UPDATE = $"{BASE}/{{id:guid}}";
             
             // public const string FILTER = $"{V1_BASE}/Games/Filter";
             // public const string FILTER_GENRES = $"{V1_BASE}/Games/FilterGenres";

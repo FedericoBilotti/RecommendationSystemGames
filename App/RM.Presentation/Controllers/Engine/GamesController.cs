@@ -50,6 +50,22 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
         
         return Ok(gameResponse);
     }
+
+    [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
+    public async Task<ActionResult<GameFilterResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
+    {
+        Game game = updateGameRequest.MapToGame(id);
+        
+        bool wasUpdated = await gamesRepository.UpdateAsync(game, cancellationToken);
+        
+        if (!wasUpdated)
+        {
+            return BadRequest("Game not found");
+        }
+
+        GameResponseDto gameResponse = game.MapToResponse();
+        return Ok(gameResponse);
+    }
     
     /*
     [HttpPost(ApiEndpoints.V1.Games.FILTER)]

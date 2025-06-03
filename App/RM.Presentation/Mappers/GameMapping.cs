@@ -17,6 +17,18 @@ public static class GameMapping
             Genres = createGameRequestDto.Genre.Select(g => new Genre { Name = g }).ToList()
         };
     }
+    
+    public static Game MapToGame(this UpdateGameRequestDto createGameRequestDto, Guid id)
+    {
+        return new Game
+        {
+            GameId = id,
+            Title = createGameRequestDto.Title,
+            Description = createGameRequestDto.Description,
+            YearOfRelease = createGameRequestDto.YearOfRelease,
+            Genres = createGameRequestDto.Genre.Select(g => new Genre { Name = g }).ToList()
+        };
+    }
 
     public static GameResponseDto MapToResponse(this Game game)
     {
