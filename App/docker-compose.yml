@@ -1,37 +1,13 @@
-﻿version: '3.8'
+﻿version: '3.9'
 
 services:
-  webapi:
-    build:
-      context: .
-      dockerfile: RM.Presentation/Dockerfile
-    image: recommendationgames_webapi:latest
-    container_name: recommendationgames_webapi
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=RecommendationGamesDb;User Id=sa;Password=MyPasswordIsSecure123;TrustServerCertificate=True;
-    networks:
-      - app-network
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: recommendationgames_db
     environment:
-      SA_PASSWORD: "MyPasswordIsSecure123"
-      ACCEPT_EULA: "Y"
+       - ACCEPT_EULA=Y
+       - SA_PASSWORD=P@ssw0rd
+       - MSSQL_PID=Developer
     ports:
       - "1433:1433"
-    volumes:
-      - sqldata:/var/opt/mssql
-    networks:
-      - app-network
-
-networks:
-  app-network:
-
-volumes:
-  sqldata:
