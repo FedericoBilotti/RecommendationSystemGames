@@ -60,11 +60,24 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
         
         if (!wasUpdated)
         {
-            return BadRequest("Game not found");
+            return NotFound("Game not found");
         }
 
         GameResponseDto gameResponse = game.MapToResponse();
         return Ok(gameResponse);
+    }
+    
+    [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
+    public async Task<ActionResult<GameFilterResponseDto>> Delete([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
+    {
+        bool wasDeleted = await gamesRepository.DeleteByIdAsync(id, cancellationToken);
+
+        if (!wasDeleted)
+        {
+            return NotFound("Game not found");
+        }
+
+        return Ok();
     }
     
     /*
