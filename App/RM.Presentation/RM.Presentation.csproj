@@ -34,4 +34,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Properties\launchSettings.json" />
+  </ItemGroup>
+
 </Project>

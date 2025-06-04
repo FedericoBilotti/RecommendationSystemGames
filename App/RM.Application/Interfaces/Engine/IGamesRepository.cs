@@ -10,4 +10,5 @@ public interface IGamesRepository
     Task<bool> UpdateAsync(Game game, CancellationToken cancellationToken = default);
     Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<bool> ExistsByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
 }

@@ -43,7 +43,7 @@ public static class DependenciesConfig
 
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
-        builder.Services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddScoped<IUserRepository, UserRepository>();
   

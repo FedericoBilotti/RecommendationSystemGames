@@ -13,7 +13,7 @@ public static class ApiEndpoints
             private const string BASE = $"{V1_BASE}/Games";
             
             public const string CREATE = $"{BASE}";
-            public const string GET = $"{BASE}/{{id:idOrSlug}}";
+            public const string GET = $"{BASE}/{{idOrSlug}}";
             public const string GET_ALL = $"{BASE}";
             public const string UPDATE = $"{BASE}/{{id:guid}}";
             public const string DELETE = $"{BASE}/{{id:guid}}";
