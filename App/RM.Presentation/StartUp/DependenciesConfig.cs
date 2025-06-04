@@ -16,7 +16,6 @@ using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
-using RM.Infrastructure.StartUp;
 
 namespace RM.Presentation.StartUp;
 

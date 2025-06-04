@@ -1,4 +1,3 @@
-using RM.Infrastructure.StartUp;
 using RM.Presentation.StartUp;
 
 var builder = WebApplication.CreateBuilder(args);

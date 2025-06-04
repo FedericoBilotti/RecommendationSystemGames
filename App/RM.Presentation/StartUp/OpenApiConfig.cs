@@ -1,9 +1,6 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 
-namespace RM.Infrastructure.StartUp;
+namespace RM.Presentation.StartUp;
 
 public static class OpenApiConfig
 {
