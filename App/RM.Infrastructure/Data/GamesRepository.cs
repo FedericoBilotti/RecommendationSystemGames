@@ -1,12 +1,15 @@
+using App.Interfaces;
 using App.Interfaces.Engine;
 using RM.Domain.Entities.Games;
 
 namespace RM.Infrastructure.Data;
 
-public class GamesRepository : IGamesRepository
+public class GamesRepository(IDbConnectionFactory dbConnectionFactory) : IGamesRepository
 {
-    public Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {
+        using var connection = await dbConnectionFactory.GetConnectionAsync();
+        
         throw new NotImplementedException();
     }
 
@@ -31,6 +34,11 @@ public class GamesRepository : IGamesRepository
     }
 
     public Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ExistsByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
