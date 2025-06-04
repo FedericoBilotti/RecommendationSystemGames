@@ -43,9 +43,11 @@ public static class DependenciesConfig
         });
 
         // Database
-        builder.Services.AddDbContext<AppDbContext>(options => { options.UseSqlServer(builder.Configuration.GetConnectionString("UserDatabase")); });
+        string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
+        builder.Services.AddDbContext<AppDbContext>(options => { options.UseNpgsql(connectionString); });
+        builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+  
         // Authentication 
         builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
         builder.Services.AddScoped<ITokenService, AuthTokenService>();

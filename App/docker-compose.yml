@@ -1,13 +1,13 @@
 ﻿version: '3.9'
 
 services:
-
+  
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: recommendationgames_db
+    image: postgres:latest
+    restart: always
     environment:
-       - ACCEPT_EULA=Y
-       - SA_PASSWORD=P@ssw0rd
-       - MSSQL_PID=Developer
+      POSTGRES_USER: recom
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_DB: recommendationgames
     ports:
-      - "1433:1433"
+      - "5433:5432"
