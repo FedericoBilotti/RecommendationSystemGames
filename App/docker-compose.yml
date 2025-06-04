@@ -2,8 +2,9 @@
 
 services:
   
-  db:
-    image: postgres:latest
+  postgres-db:
+    image: postgres:17
+    container_name: postgres-db
     restart: always
     environment:
       POSTGRES_USER: recom
@@ -11,3 +12,20 @@ services:
       POSTGRES_DB: recommendationgames
     ports:
       - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    
+  api-recommendationgames:
+    build:
+      context: .
+      dockerfile: RM.Presentation/Dockerfile
+    container_name: api-recommendationgames
+    depends_on:
+      - postgres-db
+    environment:
+      - ConnectionStrings__Default=Host=db;Port=5433;Database=recommendationgames;Username=recom;Password=abc123
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:
