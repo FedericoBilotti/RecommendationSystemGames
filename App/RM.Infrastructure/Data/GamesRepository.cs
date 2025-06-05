@@ -1,16 +1,16 @@
-using App.Interfaces;
 using App.Interfaces.Engine;
 using RM.Domain.Entities.Games;
+using RM.Infrastructure.Database;
 
 namespace RM.Infrastructure.Data;
 
-public class GamesRepository(IDbConnectionFactory dbConnectionFactory) : IGamesRepository
+public class GamesRepository(AppDbContext appDbContext) : IGamesRepository
 {
     public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {
-        using var connection = await dbConnectionFactory.GetConnectionAsync();
-        
-        throw new NotImplementedException();
+        await appDbContext.Games.AddAsync(game, cancellationToken);
+        int result = await appDbContext.SaveChangesAsync(cancellationToken);
+        return result > 0;
     }
 
     public Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)

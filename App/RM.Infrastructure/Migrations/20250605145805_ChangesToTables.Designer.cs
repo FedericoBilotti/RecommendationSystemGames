@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RM.Infrastructure.Database;
@@ -11,9 +12,11 @@ using RM.Infrastructure.Database;
 namespace RM.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250605145805_ChangesToTables")]
+    partial class ChangesToTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace RM.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("GameGenres", b =>
-                {
-                    b.Property<Guid>("GameId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("GenreId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("GameId", "GenreId");
-
-                    b.HasIndex("GenreId");
-
-                    b.ToTable("GameGenres", (string)null);
-                });
 
             modelBuilder.Entity("RM.Domain.Entities.Games.Game", b =>
                 {
@@ -65,7 +53,7 @@ namespace RM.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Games", (string)null);
+                    b.ToTable("Game", (string)null);
                 });
 
             modelBuilder.Entity("RM.Domain.Entities.Games.Genre", b =>
@@ -74,13 +62,18 @@ namespace RM.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("GameId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("GenreId");
 
-                    b.ToTable("Genres", (string)null);
+                    b.HasIndex("GameId");
+
+                    b.ToTable("Genre", (string)null);
                 });
 
             modelBuilder.Entity("RM.Domain.Entities.User", b =>
@@ -113,24 +106,7 @@ namespace RM.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("GameGenres", b =>
-                {
-                    b.HasOne("RM.Domain.Entities.Games.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_GameGenres_Games");
-
-                    b.HasOne("RM.Domain.Entities.Games.Genre", null)
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_GameGenres_Genres");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("RM.Domain.Entities.Games.Game", b =>
@@ -138,6 +114,18 @@ namespace RM.Infrastructure.Migrations
                     b.HasOne("RM.Domain.Entities.User", null)
                         .WithMany("FavoriteGames")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("RM.Domain.Entities.Games.Genre", b =>
+                {
+                    b.HasOne("RM.Domain.Entities.Games.Game", null)
+                        .WithMany("Genres")
+                        .HasForeignKey("GameId");
+                });
+
+            modelBuilder.Entity("RM.Domain.Entities.Games.Game", b =>
+                {
+                    b.Navigation("Genres");
                 });
 
             modelBuilder.Entity("RM.Domain.Entities.User", b =>
