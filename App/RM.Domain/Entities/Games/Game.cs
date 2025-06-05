@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 
 namespace RM.Domain.Entities.Games;
@@ -10,7 +9,7 @@ public class Game
     public required string Description { get; init; }
     public required int YearOfRelease { get; init; }
     public int UserRating { get; init; }
-    public required List<Genre> Genres { get; init; } = new();
+    public required List<string> Genres { get; init; } = new();
 
     public string Slug => GenerateSlug();
 

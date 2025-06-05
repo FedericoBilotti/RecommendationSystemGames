@@ -24,6 +24,7 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
         }
 
         GameResponseDto gameResponse = game.MapToResponse();
+        return Created($"{ApiEndpoints.V1.Games.GET}/{game.GameId}", gameResponse);
         return CreatedAtAction(nameof(Get), new { id = game.GameId }, gameResponse);
     }
 

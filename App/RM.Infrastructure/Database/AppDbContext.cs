@@ -8,7 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Game> Games { get; set; }
-    public DbSet<Genre> Genres { get; set; }
+    // public DbSet<Genre> Genres { get; set; }
     //
     // protected override void OnModelCreating(ModelBuilder modelBuilder)
     // {

@@ -14,19 +14,19 @@ public static class GameMapping
             Title = createGameRequestDto.Title,
             Description = createGameRequestDto.Description,
             YearOfRelease = createGameRequestDto.YearOfRelease,
-            Genres = new()
+            Genres = createGameRequestDto.Genre.ToList()
         };
     }
 
-    public static Game MapToGame(this UpdateGameRequestDto createGameRequestDto, Guid id)
+    public static Game MapToGame(this UpdateGameRequestDto updateGameRequestDto, Guid id)
     {
         return new Game
         {
             GameId = id,
-            Title = createGameRequestDto.Title,
-            Description = createGameRequestDto.Description,
-            YearOfRelease = createGameRequestDto.YearOfRelease,
-            Genres = new()
+            Title = updateGameRequestDto.Title,
+            Description = updateGameRequestDto.Description,
+            YearOfRelease = updateGameRequestDto.YearOfRelease,
+            Genres = updateGameRequestDto.Genre.ToList()
         };
     }
 
@@ -38,7 +38,7 @@ public static class GameMapping
             Title = game.Title,
             Description = game.Description,
             YearOfRelease = game.YearOfRelease,
-            Genre = game.Genres.Select(g => g.Name).ToList()
+            Genre = game.Genres
         };
     }
 
