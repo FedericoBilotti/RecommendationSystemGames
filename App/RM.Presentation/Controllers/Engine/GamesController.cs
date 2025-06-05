@@ -13,7 +13,7 @@ namespace RM.Presentation.Controllers.Engine;
 public class GamesController(IGamesRepository gamesRepository) : ControllerBase
 {
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
-    public async Task<ActionResult<GameFilterResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
         Game game = createGameRequest.MapToGame();
         bool wasCreated = await gamesRepository.CreateAsync(game, cancellationToken);
@@ -29,7 +29,7 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET)]
-    public async Task<ActionResult<GameFilterResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
         Game? game = Guid.TryParse(idOrSlug, out Guid gameId) 
                 ? await gamesRepository.GetByIdAsync(gameId, cancellationToken) 
@@ -45,7 +45,7 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
-    public async Task<ActionResult<GameFilterResponseDto>> GetAll(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GamesResponseDto>> GetAll(CancellationToken cancellationToken = default)
     {
         IEnumerable<Game> game = await gamesRepository.GetAllAsync(cancellationToken);
 
@@ -55,7 +55,7 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
     }
 
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
-    public async Task<ActionResult<GameFilterResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
     {
         Game game = updateGameRequest.MapToGame(id);
 
@@ -71,7 +71,7 @@ public class GamesController(IGamesRepository gamesRepository) : ControllerBase
     }
 
     [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
-    public async Task<ActionResult<GameFilterResponseDto>> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         bool wasDeleted = await gamesRepository.DeleteByIdAsync(id, cancellationToken);
 

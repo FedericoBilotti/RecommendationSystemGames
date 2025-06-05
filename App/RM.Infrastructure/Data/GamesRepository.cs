@@ -84,21 +84,21 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
     {
         using var connection = await connectionFactory.GetConnectionAsync();
 
-        var games = await connection.QueryAsync<Game>(new CommandDefinition("""
-                                                                            SELECT games.*, string_agg(genres.name, ', ') as genres
-                                                                            FROM games as games
+        var games = await connection.QueryAsync(new CommandDefinition("""
+                                                                            SELECT gam.*, string_agg(genres.name, ', ') as genres
+                                                                            FROM games as gam
                                                                             LEFT JOIN genres as genres 
-                                                                                ON games.gameId = genres.gameId
-                                                                            GROUP BY games.gameId
+                                                                                ON gam.gameId = genres.gameId
+                                                                            GROUP BY gam.gameId
                                                                             """));
         
         return games.Select(g => new Game
         {
-            GameId = g.GameId,
-            Title = g.Title,
-            Description = g.Description,
-            YearOfRelease = g.YearOfRelease,
-            Genres = g.Genres.SelectMany(g => g.Split(',')).ToList()
+            GameId = g.gameid,
+            Title = g.title,
+            YearOfRelease = g.yearofrelease,
+            Description = g.description,
+            Genres = Enumerable.ToList(g.genres.Split(','))
         });
     }
 

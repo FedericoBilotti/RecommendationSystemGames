@@ -4,7 +4,7 @@ namespace RM.Domain.Entities.Games;
 
 public class Game
 {
-    public Guid GameId { get; init; }
+    public required Guid GameId { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required int YearOfRelease { get; init; }
