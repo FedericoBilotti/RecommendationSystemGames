@@ -32,7 +32,7 @@ public static class GameMapping
 
     public static GameResponseDto MapToResponse(this Game game)
     {
-        return new GameResponseDto
+        var gameResponse = new GameResponseDto
         {
             GameId = game.GameId,
             Title = game.Title,
@@ -41,6 +41,11 @@ public static class GameMapping
             YearOfRelease = game.YearOfRelease,
             Genre = game.Genres
         };
+        
+        if (game.UserRating != 0)
+            gameResponse.UserRating = game.UserRating;
+        
+        return gameResponse;
     }
 
     public static GamesResponseDto MapToResponse(this IEnumerable<Game> game)
