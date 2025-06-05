@@ -37,6 +37,7 @@ public static class GameMapping
             GameId = game.GameId,
             Title = game.Title,
             Description = game.Description,
+            Slug = game.Slug,
             YearOfRelease = game.YearOfRelease,
             Genre = game.Genres
         };
