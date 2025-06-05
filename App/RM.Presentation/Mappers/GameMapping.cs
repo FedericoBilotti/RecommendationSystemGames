@@ -14,10 +14,10 @@ public static class GameMapping
             Title = createGameRequestDto.Title,
             Description = createGameRequestDto.Description,
             YearOfRelease = createGameRequestDto.YearOfRelease,
-            Genres = createGameRequestDto.Genre.Select(g => new Genre { Name = g }).ToList()
+            Genres = new()
         };
     }
-    
+
     public static Game MapToGame(this UpdateGameRequestDto createGameRequestDto, Guid id)
     {
         return new Game
@@ -26,7 +26,7 @@ public static class GameMapping
             Title = createGameRequestDto.Title,
             Description = createGameRequestDto.Description,
             YearOfRelease = createGameRequestDto.YearOfRelease,
-            Genres = createGameRequestDto.Genre.Select(g => new Genre { Name = g }).ToList()
+            Genres = new()
         };
     }
 
@@ -41,7 +41,7 @@ public static class GameMapping
             Genre = game.Genres.Select(g => g.Name).ToList()
         };
     }
-    
+
     public static GamesResponseDto MapToResponse(this IEnumerable<Game> game)
     {
         return new GamesResponseDto

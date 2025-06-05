@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using RM.Infrastructure.Database;
 using RM.Presentation.StartUp;
 
@@ -21,4 +20,8 @@ app.UseOpenApi();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+await dbInitializer.InitializeDbAsync();
+
 app.Run();

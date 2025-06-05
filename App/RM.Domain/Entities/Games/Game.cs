@@ -12,7 +12,7 @@ public class Game
     public int UserRating { get; init; }
     public required List<Genre> Genres { get; init; } = new();
 
-    [NotMapped] public string Slug => GenerateSlug();
+    public string Slug => GenerateSlug();
 
     private string GenerateSlug()
     {

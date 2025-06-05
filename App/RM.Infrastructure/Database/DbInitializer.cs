@@ -14,8 +14,8 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                       title TEXT NOT NULL,
                                       slug TEXT NOT NULL,
                                       yearOfRelease INTEGER NOT NULL,
-                                      userRating INTEGER);
                                       description TEXT NOT NULL,
+                                      userRating INTEGER);
                                       """);
         
         await connection.ExecuteAsync("""
