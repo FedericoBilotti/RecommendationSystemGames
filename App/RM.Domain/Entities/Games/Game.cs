@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 
@@ -6,21 +5,18 @@ namespace RM.Domain.Entities.Games;
 
 public class Game
 {
-    [Key] public Guid GameId { get; init; }
-    public string Title { get; init; }
-    public string slug => GenerateSlug();
+    public Guid GameId { get; init; }
+    public required string Title { get; init; }
     public required string Description { get; init; }
     public required string YearOfRelease { get; init; }
+    public int UserRating { get; init; }
+    public required List<Genre> Genres { get; init; } = new();
 
-    public int UserRating { get; init; } 
-    
-    [ForeignKey("GenreId")]
-    public List<Genre> Genres { get; init; } = [];
-    
+    [NotMapped] public string Slug => GenerateSlug();
+
     private string GenerateSlug()
     {
-        string slugTitle = Regex.Replace(Title, "[^0-9A-Za-z _-]", string.Empty)
-                .ToLower().Replace(" ", "-");
+        string slugTitle = Regex.Replace(Title, "[^0-9A-Za-z _-]", string.Empty).ToLower().Replace(" ", "-");
         return $"{slugTitle}-{YearOfRelease}";
     }
 }
