@@ -5,10 +5,10 @@ namespace RM.Domain.Entities;
 public class User
 {
     public Guid UserId { get; init; }
-    public string Email { get; init; } = string.Empty;
-    public string Username { get; init; } = string.Empty;
-    public string HashedPassword { get; init; } = string.Empty;
-    public string Role { get; init; } = string.Empty;
+    public string Email { get; init; }
+    public string Username { get; init; }
+    public string HashedPassword { get; init; }
+    public string Role { get; init; }
     
     public IEnumerable<Game> FavoriteGames { get; init; } = [];
     

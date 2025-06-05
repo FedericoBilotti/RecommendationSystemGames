@@ -1,0 +1,22 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.9"
+services:
+  api-recommendationgames:
+    build:
+      context: "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App"
+      dockerfile: "RM.Presentation/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/RM.Presentation.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "rm.presentation:dev"
+    ports: []
+    volumes:
+    - "C:\\Users\\fedeb\\.nuget\\packages:/root/.nuget/packages"
+    - "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App\\RM.Presentation:/app:rw"
+    - "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App:/src:rw"
+    working_dir: "/app"

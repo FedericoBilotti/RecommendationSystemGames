@@ -1,3 +1,4 @@
+using RM.Infrastructure.Database;
 using RM.Presentation.StartUp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,8 @@ var app = builder.Build();
 
 // using (var scope = app.Services.CreateScope())
 // {
-//     var services = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//     services.Database.Migrate();
+//     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//     context.Database.Migrate();
 // }
 
 app.UseOpenApi();
@@ -19,4 +20,8 @@ app.UseOpenApi();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+await dbInitializer.InitializeDbAsync();
+
 app.Run();
