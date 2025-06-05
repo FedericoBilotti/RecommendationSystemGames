@@ -8,7 +8,7 @@ public class Game
     public Guid GameId { get; init; }
     public required string Title { get; init; }
     public required string Description { get; init; }
-    public required string YearOfRelease { get; init; }
+    public required int YearOfRelease { get; init; }
     public int UserRating { get; init; }
     public required List<Genre> Genres { get; init; } = new();
 

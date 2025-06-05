@@ -24,6 +24,10 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                       USING btree(slug);
                                       """);
         
-        
+        await connection.ExecuteAsync("""
+                                      CREATE TABLE IF NOT EXISTS genres (
+                                      gameId UUID REFERENCES games(gameId),
+                                      name TEXT NOT NULL);
+                                      """);
     }
 }

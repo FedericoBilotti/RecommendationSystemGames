@@ -1,34 +1,34 @@
+using App.Interfaces;
 using App.Interfaces.Engine;
-using Microsoft.EntityFrameworkCore;
+using Dapper;
 using RM.Domain.Entities.Games;
-using RM.Infrastructure.Database;
 
 namespace RM.Infrastructure.Data;
 
-public class GamesRepository(AppDbContext appDbContext) : IGamesRepository
+public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRepository
 {
     public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {        
-        foreach (Genre genreName in game.Genres.ToList())
+        using var connection = await connectionFactory.GetConnectionAsync();
+        using var transaction = connection.BeginTransaction();
+
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+                                                   INSERT INTO games (gameId, title, slug, yearOfRelease, description, userRating)
+                                                   VALUES (@gameId, @title, @slug, @yearOfRelease, @description, @userRating)
+                                                   """, game));
+
+        if (result > 0)
         {
-            Genre? existingGenre = await appDbContext.Genres.FirstOrDefaultAsync(g => g.Name == genreName.Name, cancellationToken);
-
-            if (existingGenre != null)
+            foreach (Genre genre in game.Genres)
             {
-                game.Genres.Add(existingGenre);
-                continue;
+                await connection.ExecuteAsync(new CommandDefinition("""
+                                                                    INSERT INTO genres (gameId, name)
+                                                                    VALUES (@gameId, @name)
+                                                                    """, new { gameId = game.GameId, name = genre }));
             }
-
-            var newGenre = new Genre
-            {
-                GenreId = Guid.NewGuid(),
-                Name = genreName.Name
-            };
-            game.Genres.Add(newGenre);
         }
-        
-        await appDbContext.Games.AddAsync(game, cancellationToken);
-        int result = await appDbContext.SaveChangesAsync(cancellationToken);
+
+        transaction.Commit();
         return result > 0;
     }
 
