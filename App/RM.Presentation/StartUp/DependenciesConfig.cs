@@ -43,9 +43,10 @@ public static class DependenciesConfig
 
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
-        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+        // builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
+        builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
   
