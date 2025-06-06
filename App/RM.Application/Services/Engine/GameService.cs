@@ -3,7 +3,7 @@ using RM.Domain.Entities.Games;
 
 namespace App.Services.Engine;
 
-public class GameService(IGamesRepository gamesRepository) : IGameService
+public class GameService(IGamesRepository gamesRepository, IGameService gameService) : IGameService
 {
     public Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {

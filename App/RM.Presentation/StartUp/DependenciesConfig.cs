@@ -9,6 +9,7 @@ using App.UseCases.Authentication;
 using App.UseCases.Engine;
 using RM.Application;
 using DotNetEnv;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,8 @@ public static class DependenciesConfig
         // builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
+        // This must go in the RM.Application project
+        // builder.Services.AddValidatorsFromAssemblies<IApplicationMarker>(ServiceLifetime.Singleton);
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
