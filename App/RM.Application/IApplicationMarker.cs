@@ -1,3 +1,3 @@
-namespace App.Interfaces;
+namespace App;
 
-public interface IApplicationMarker;
+public interface IApplicationMarker { }

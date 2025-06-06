@@ -20,4 +20,8 @@
       <ProjectReference Include="..\RM.Domain\RM.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="StartUp\" />
+    </ItemGroup>
+
 </Project>

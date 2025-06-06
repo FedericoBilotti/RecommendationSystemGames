@@ -1,13 +1,17 @@
 using App.Interfaces.Engine;
+using App.Validators;
+using FluentValidation;
 using RM.Domain.Entities.Games;
 
 namespace App.Services.Engine;
 
-public class GameService(IGamesRepository gamesRepository, IGameService gameService) : IGameService
+public class GameService(IGamesRepository gamesRepository, IValidator<Game> gameValidator) : IGameService
 {
-    public Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {
-        return gamesRepository.CreateAsync(game, cancellationToken);
+        await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
+        
+        return await gamesRepository.CreateAsync(game, cancellationToken);
     }
 
     public Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
@@ -22,7 +26,9 @@ public class GameService(IGamesRepository gamesRepository, IGameService gameServ
 
     public async Task<Game?> UpdateAsync(Game game, CancellationToken cancellationToken = default)
     {
-        var movieExists = await gamesRepository.ExistsByIdAsync(game.GameId, cancellationToken);
+        await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
+        
+        bool movieExists = await gamesRepository.ExistsByIdAsync(game.GameId, cancellationToken);
 
         if (!movieExists) return null;
         

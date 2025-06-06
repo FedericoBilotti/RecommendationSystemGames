@@ -1,4 +1,5 @@
 using System.Text;
+using App;
 using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.Interfaces.Engine;
@@ -41,18 +42,17 @@ public static class DependenciesConfig
                 ValidateIssuerSigningKey = true
             };
         });
-
+        
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
         // builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
-        // This must go in the RM.Application project
-        // builder.Services.AddValidatorsFromAssemblies<IApplicationMarker>(ServiceLifetime.Singleton);
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
-  
+        builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
+        
         // Authentication 
         builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
         builder.Services.AddScoped<ITokenService, AuthTokenService>();

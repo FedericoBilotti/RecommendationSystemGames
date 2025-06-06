@@ -1,3 +1,4 @@
+using App.Mappers;
 using RM.Infrastructure.Database;
 using RM.Presentation.StartUp;
 
@@ -19,6 +20,8 @@ app.UseOpenApi();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
 
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
