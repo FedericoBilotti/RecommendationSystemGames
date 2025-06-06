@@ -22,7 +22,8 @@ public class GameValidator : AbstractValidator<Game>
                 .WithMessage("Slug already exists");
         
         RuleFor(x => x.YearOfRelease)
-                .LessThanOrEqualTo(DateTime.UtcNow.Year);
+                .LessThanOrEqualTo(DateTime.UtcNow.Year)
+                .GreaterThanOrEqualTo(1952);
     }
 
     private async Task<bool> ValidateSlug(Game game, string slug, CancellationToken cancellationToken = default)

@@ -45,13 +45,13 @@ public static class DependenciesConfig
         
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
-        // builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
-        builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>(ServiceLifetime.Singleton);
+        builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         
         // Authentication 
         builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
@@ -62,11 +62,11 @@ public static class DependenciesConfig
         builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
         builder.Services.AddScoped<AuthenticateUserUseCase, AuthenticateUserUseCase>();
 
-        // Engine
-        builder.Services.Configure<RawgApiSettings>(options => options.RawgApikey = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
-        builder.Services.AddHttpClient<IEngine, EngineService>();
-        builder.Services.AddScoped<IDeserializer, JsonDeserializerService>();
-        builder.Services.AddScoped<IEngine, EngineService>();
-        builder.Services.AddScoped<IEngineUseCase, EngineUseCase>();
+        // // Engine
+        // builder.Services.Configure<RawgApiSettings>(options => options.RawgApikey = Environment.GetEnvironmentVariable("RAWG_APIKEY"));
+        // builder.Services.AddHttpClient<IEngine, EngineService>();
+        // builder.Services.AddScoped<IDeserializer, JsonDeserializerService>();
+        // builder.Services.AddScoped<IEngine, EngineService>();
+        // builder.Services.AddScoped<IEngineUseCase, EngineUseCase>();
     }
 }
