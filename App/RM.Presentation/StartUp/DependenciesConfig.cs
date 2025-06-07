@@ -1,4 +1,3 @@
-using System.Text;
 using App;
 using App.Interfaces;
 using App.Interfaces.Authentication;
@@ -7,10 +6,8 @@ using App.Services.Authenticate;
 using App.Services.Engine;
 using App.UseCases.Authentication;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
@@ -22,20 +19,6 @@ public static class DependenciesConfig
     public static void AddDependencies(this WebApplicationBuilder builder)
     {
         builder.Services.AddOpenApiServices();
-
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = builder.Configuration["AppSettings:Issuer"],
-                ValidateAudience = true,
-                ValidAudience = builder.Configuration["AppSettings:Audience"],
-                ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
-                ValidateIssuerSigningKey = true
-            };
-        });
         
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
