@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using App.Dtos.Authentication;
+using App.Dtos.Authentication.Request;
+using App.Dtos.Authentication.Response;
 using App.Interfaces;
 using App.Interfaces.Authentication;
 using Microsoft.Extensions.Configuration;

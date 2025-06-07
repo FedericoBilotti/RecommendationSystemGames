@@ -1,4 +1,6 @@
 using App.Dtos.Authentication;
+using App.Dtos.Authentication.Request;
+using App.Dtos.Authentication.Response;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
