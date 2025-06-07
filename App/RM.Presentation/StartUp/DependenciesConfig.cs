@@ -25,8 +25,6 @@ public static class DependenciesConfig
 {
     public static void AddDependencies(this WebApplicationBuilder builder)
     {
-        Env.Load();
-
         builder.Services.AddOpenApiServices();
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

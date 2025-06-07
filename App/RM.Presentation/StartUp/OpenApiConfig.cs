@@ -1,5 +1,3 @@
-using Scalar.AspNetCore;
-
 namespace RM.Presentation.StartUp;
 
 public static class OpenApiConfig
@@ -7,20 +5,20 @@ public static class OpenApiConfig
     public static void AddOpenApiServices(this IServiceCollection services)
     {
         services.AddOpenApi();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
     }
-
+    
     public static void UseOpenApi(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        // if (!app.Environment.IsDevelopment()) return;
+        
+        app.MapOpenApi();
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
         {
-            app.MapOpenApi();
-            app.MapScalarApiReference(options =>
-            {
-                options.Title = "RecommendationSystemGames";
-                options.Theme = ScalarTheme.Moon;
-                options.Layout = ScalarLayout.Modern;
-                options.HideClientButton = true;
-            });
-        }
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Recommendation Games API V1");
+            c.RoutePrefix = "swagger";
+        });
     }
 }

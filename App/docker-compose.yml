@@ -23,7 +23,8 @@ services:
     depends_on:
       - postgres-db
     environment:
-      - ConnectionStrings__Default=Host=db;Port=5433;Database=recommendationgames;Username=recom;Password=abc123
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+      - USER_DATABASE=Server=postgres-db;Port=5432;Database=recommendationgames;User ID=recom;Password=abc123
     ports:
       - "8090:8080"
 
