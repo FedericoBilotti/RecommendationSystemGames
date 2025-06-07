@@ -1,6 +1,7 @@
 using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
+using Microsoft.AspNetCore.Authorization;
 using RM.Domain.Entities.Games;
 using RM.Presentation.Mappers;
 using RM.Presentation.Routes;
@@ -11,6 +12,7 @@ namespace RM.Presentation.Controllers.Engine;
 [ApiController]
 public class GamesController(IGameService gameService) : ControllerBase
 {
+    [Authorize(AuthConstants.ADMIN_ROLE)]
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
@@ -52,6 +54,7 @@ public class GamesController(IGameService gameService) : ControllerBase
         return Ok(gameResponse);
     }
 
+    [Authorize(AuthConstants.ADMIN_ROLE)]
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
     public async Task<ActionResult<GameResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
     {
@@ -67,6 +70,7 @@ public class GamesController(IGameService gameService) : ControllerBase
         return Ok(gameResponse);
     }
 
+    [Authorize(AuthConstants.ADMIN_ROLE)]
     [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {

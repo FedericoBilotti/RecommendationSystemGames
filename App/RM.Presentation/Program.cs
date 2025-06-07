@@ -1,8 +1,10 @@
+using System.Security.Cryptography;
 using System.Text;
 using App.Mappers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RM.Infrastructure.Database;
+using RM.Presentation;
 using RM.Presentation.StartUp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.AddDependencies();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthConstants.ADMIN_ROLE, policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
+});
 
 builder.Services.AddAuthentication(authOptions =>
 {
