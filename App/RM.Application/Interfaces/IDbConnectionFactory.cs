@@ -4,5 +4,5 @@ namespace App.Interfaces;
 
 public interface IDbConnectionFactory
 {
-    Task<IDbConnection> GetConnectionAsync();
+    Task<IDbConnection> GetConnectionAsync(CancellationToken cancellationToken = default);
 }

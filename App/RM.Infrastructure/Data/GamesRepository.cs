@@ -8,14 +8,14 @@ namespace RM.Infrastructure.Data;
 public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRepository
 {
     public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
-    {        
-        using var connection = await connectionFactory.GetConnectionAsync();
+    {
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
         using var transaction = connection.BeginTransaction();
 
         var result = await connection.ExecuteAsync(new CommandDefinition("""
-                                                   INSERT INTO games (gameId, title, slug, yearOfRelease, description, userRating)
-                                                   VALUES (@gameId, @title, @slug, @yearOfRelease, @description, @userRating)
-                                                   """, game));
+                                                                         INSERT INTO games (gameId, title, slug, yearOfRelease, description, userRating)
+                                                                         VALUES (@gameId, @title, @slug, @yearOfRelease, @description, @userRating)
+                                                                         """, game, cancellationToken: cancellationToken));
 
         if (result > 0)
         {
@@ -24,7 +24,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                 await connection.ExecuteAsync(new CommandDefinition("""
                                                                     INSERT INTO genres (gameId, name)
                                                                     VALUES (@gameId, @name)
-                                                                    """, new { gameId = game.GameId, name = genre }));
+                                                                    """, new { gameId = game.GameId, name = genre }, cancellationToken: cancellationToken));
             }
         }
 
@@ -34,20 +34,20 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
     public async Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var game = await connection.QueryFirstOrDefaultAsync<Game>(new CommandDefinition("""
                                                                                          SELECT * FROM games
                                                                                          WHERE gameId = @gameId
-                                                                                         """, new { gameId }));
-        
+                                                                                         """, new { gameId }, cancellationToken: cancellationToken));
+
         if (game == null) return null;
 
         var genres = await connection.QueryAsync<string>(new CommandDefinition("""
                                                                                SELECT name FROM genres
                                                                                WHERE gameId = @gameId
-                                                                               """, new { gameId }));
-        
+                                                                               """, new { gameId }, cancellationToken: cancellationToken));
+
         foreach (var genre in genres)
         {
             game.Genres.Add(genre);
@@ -58,20 +58,20 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
     public async Task<Game?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var game = await connection.QueryFirstOrDefaultAsync<Game>(new CommandDefinition("""
                                                                                          SELECT * FROM games
                                                                                          WHERE slug = @slug
-                                                                                         """, new { slug }));
-        
+                                                                                         """, new { slug }, cancellationToken: cancellationToken));
+
         if (game == null) return null;
 
         var genres = await connection.QueryAsync<string>(new CommandDefinition("""
-                                                                              SELECT name FROM genres
-                                                                              WHERE gameId = @gameId
-                                                                              """, new { game.Slug }));
-        
+                                                                               SELECT name FROM genres
+                                                                               WHERE gameId = @gameId
+                                                                               """, new { game.Slug }, cancellationToken: cancellationToken));
+
         foreach (var genre in genres)
         {
             game.Genres.Add(genre);
@@ -82,16 +82,16 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
     public async Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var games = await connection.QueryAsync(new CommandDefinition("""
-                                                                            SELECT gam.*, string_agg(genres.name, ', ') as genres
-                                                                            FROM games as gam
-                                                                            LEFT JOIN genres as genres 
-                                                                                ON gam.gameId = genres.gameId
-                                                                            GROUP BY gam.gameId
-                                                                            """));
-        
+                                                                      SELECT gam.*, string_agg(gen.name, ', ') as genres
+                                                                      FROM games as gam
+                                                                      LEFT JOIN genres as gen
+                                                                          ON gam.gameId = gen.gameId
+                                                                      GROUP BY gam.gameId
+                                                                      """, cancellationToken: cancellationToken));
+
         return games.Select(g => new Game
         {
             GameId = g.gameid,
@@ -104,20 +104,20 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
     public async Task<bool> UpdateAsync(Game game, CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
         using var transaction = connection.BeginTransaction();
 
         await connection.ExecuteAsync(new CommandDefinition("""
                                                             DELETE FROM genres
                                                             WHERE gameId = @gameId
-                                                            """, new { gameId = game.GameId }));
+                                                            """, new { gameId = game.GameId }, cancellationToken: cancellationToken));
 
         foreach (string gameGenre in game.Genres)
         {
             await connection.ExecuteAsync(new CommandDefinition("""
                                                                 INSERT INTO genres (gameId, name)
                                                                 VALUES (@gameId, @name)
-                                                                """, new { gameId = game.GameId, name = gameGenre }));
+                                                                """, new { gameId = game.GameId, name = gameGenre }, cancellationToken: cancellationToken));
         }
 
         var result = await connection.ExecuteAsync(new CommandDefinition("""
@@ -127,26 +127,26 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                                                                                              yearOfRelease = @yearOfRelease,
                                                                                              userRating = @userRating
                                                                             WHERE gameId = @gameId
-                                                                         """, game));
-        
+                                                                         """, game, cancellationToken: cancellationToken));
+
         transaction.Commit();
         return result > 0;
     }
 
     public async Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
         using var transaction = connection.BeginTransaction();
-        
+
         await connection.ExecuteAsync(new CommandDefinition("""
                                                             DELETE FROM genres
                                                             WHERE gameId = @gameId
-                                                            """, new { gameId }));
-        
+                                                            """, new { gameId }, cancellationToken: cancellationToken));
+
         await connection.ExecuteAsync(new CommandDefinition("""
                                                             DELETE FROM games
                                                             WHERE gameId = @gameId
-                                                            """, new { gameId }));
+                                                            """, new { gameId }, cancellationToken: cancellationToken));
 
         transaction.Commit();
         return true;
@@ -154,11 +154,11 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
     public async Task<bool> ExistsByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
-        using var connection = await connectionFactory.GetConnectionAsync();
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         return await connection.ExecuteScalarAsync<bool>(new CommandDefinition("""
                                                                                SELECT COUNT(1) FROM games
                                                                                WHERE gameId = @gameId
-                                                                               """, new { gameId }));
+                                                                               """, new { gameId }, cancellationToken: cancellationToken));
     }
 }
