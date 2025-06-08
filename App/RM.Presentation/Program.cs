@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using System.Text;
 using App.Mappers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +15,10 @@ builder.AddDependencies();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(AuthConstants.ADMIN_ROLE, policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
+    options.AddPolicy(AuthConstants.TRUSTED_ROLE, 
+            policy => policy.RequireAssertion(x => 
+                    x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) ||
+                    x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
 });
 
 builder.Services.AddAuthentication(authOptions =>
