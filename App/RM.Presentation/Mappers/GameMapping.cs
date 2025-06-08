@@ -54,4 +54,14 @@ public static class GameMapping
             GamesResponseDtos = game.Select(g => g.MapToResponse()).ToList()
         };
     }
+    
+    public static IEnumerable<GameRatingResponseDto> MapToResponse(this IEnumerable<GameRating> ratings)
+    {
+        return ratings.Select(x => new GameRatingResponseDto
+        {
+            GameId = x.GameId,
+            Slug = x.Slug,
+            Rating = x.Rating
+        });
+    }
 }

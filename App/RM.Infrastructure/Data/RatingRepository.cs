@@ -1,6 +1,7 @@
 using App.Interfaces;
 using App.Interfaces.Engine;
 using Dapper;
+using RM.Domain.Entities.Games;
 
 namespace RM.Infrastructure.Data;
 
@@ -54,5 +55,17 @@ public class RatingRepository(IDbConnectionFactory connectionFactory) : IRatingR
                                                                          """, new { gameId, userId }, cancellationToken: cancellationToken));
 
         return result > 0;
+    }
+
+    public async Task<IEnumerable<GameRating>> GetUserRatingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
+
+        return await connection.QueryAsync<GameRating>(new CommandDefinition("""
+                                                                        SELECT rat.rating, rat.gameId, g.slug
+                                                                        FROM ratings rat
+                                                                        INNER JOIN games g ON rat.gameId = g.gameId
+                                                                        WHERE rat.userId = @userId
+                                                                        """, new { userId }, cancellationToken: cancellationToken));
     }
 }

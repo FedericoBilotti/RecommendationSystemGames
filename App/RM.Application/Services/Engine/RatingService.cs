@@ -1,6 +1,7 @@
 using App.Interfaces.Engine;
 using FluentValidation;
 using FluentValidation.Results;
+using RM.Domain.Entities.Games;
 
 namespace App.Services.Engine;
 
@@ -29,5 +30,10 @@ public class RatingService(IRatingRepository ratingRepository, IGamesRepository 
     public Task<bool> DeleteRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default)
     {
         return ratingRepository.DeleteRatingAsync(gameId, userId, cancellationToken);
+    }
+
+    public Task<IEnumerable<GameRating>> GetUserRatingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return ratingRepository.GetUserRatingsAsync(userId, cancellationToken);
     }
 }

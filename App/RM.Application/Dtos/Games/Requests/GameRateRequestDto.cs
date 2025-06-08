@@ -1,6 +1,6 @@
 namespace App.Dtos.Games.Requests;
 
-public class RateGameRequestDto
+public class GameRateRequestDto
 {
     public required int Rating { get; init; }
 }

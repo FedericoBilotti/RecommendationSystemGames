@@ -1,3 +1,5 @@
+using RM.Domain.Entities.Games;
+
 namespace App.Interfaces.Engine;
 
 public interface IRatingRepository
@@ -6,4 +8,5 @@ public interface IRatingRepository
     Task<float?> GetRatingAsync(Guid gameId, CancellationToken cancellationToken = default);
     Task<(float? Rating, int? User)> GetUserRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default);
     Task<bool> DeleteRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<GameRating>> GetUserRatingsAsync(Guid userId, CancellationToken cancellationToken = default);
 }
