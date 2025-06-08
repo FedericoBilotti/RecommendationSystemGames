@@ -10,7 +10,6 @@ using RM.Presentation.Auth;
 
 namespace RM.Presentation.Controllers.Engine;
 
-[Authorize]
 [ApiController]
 public class GamesController(IGameService gameService) : ControllerBase
 {

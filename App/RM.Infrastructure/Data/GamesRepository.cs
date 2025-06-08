@@ -93,12 +93,15 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var games = await connection.QueryAsync(new CommandDefinition("""
-                                                                      SELECT gam.*, string_agg(DISTINCT gen.name, ', ') as genres, ROUND(AVG(rat.rating), 2) as rating, myrat.rating as UserRating
-                                                                      FROM games as gam
-                                                                      LEFT JOIN genres as gen ON gam.gameId = gen.gameId
-                                                                      LEFT JOIN ratings as rat ON gam.gameId = rat.gameId
-                                                                      LEFT JOIN ratings as myrat ON gam.gameId = myrat.gameId AND myrat.userId = @userId
-                                                                      GROUP BY gam.gameId
+                                                                      SELECT g.*, 
+                                                                             string_agg(DISTINCT gen.name, ', ') as genres, 
+                                                                             ROUND(AVG(r.rating), 1) as rating, 
+                                                                             myr.rating as UserRating
+                                                                      FROM games g
+                                                                      LEFT JOIN genres gen ON g.gameId = gen.gameId
+                                                                      LEFT JOIN ratings r ON g.gameId = r.gameId
+                                                                      LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId
+                                                                      GROUP BY g.gameId, myr.rating
                                                                       """, new { userId }, cancellationToken: cancellationToken));
 
         return games.Select(g => new Game
