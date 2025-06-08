@@ -26,6 +26,7 @@ public static class DependenciesConfig
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
         builder.Services.AddScoped<IGameService, GameService>();
+        builder.Services.AddScoped<IRatingService, RatingService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
         builder.Services.AddScoped<IRatingRepository, RatingRepository>();
