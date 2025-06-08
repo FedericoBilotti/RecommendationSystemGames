@@ -6,6 +6,7 @@ using RM.Domain.Entities.Games;
 using RM.Presentation.Mappers;
 using RM.Presentation.Routes;
 using Microsoft.AspNetCore.Mvc;
+using RM.Presentation.Auth;
 
 namespace RM.Presentation.Controllers.Engine;
 
@@ -32,9 +33,10 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpGet(ApiEndpoints.V1.Games.GET)]
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
+        Guid? userId = HttpContext.GetUserId();
         Game? game = Guid.TryParse(idOrSlug, out Guid gameId) 
-                ? await gameService.GetByIdAsync(gameId, cancellationToken) 
-                : await gameService.GetBySlugAsync(idOrSlug, cancellationToken);
+                ? await gameService.GetByIdAsync(gameId, userId, cancellationToken) 
+                : await gameService.GetBySlugAsync(idOrSlug, userId, cancellationToken);
 
         if (game == null)
         {
@@ -48,7 +50,8 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
     public async Task<ActionResult<GamesResponseDto>> GetAll(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Game> game = await gameService.GetAllAsync(cancellationToken);
+        Guid? userId = HttpContext.GetUserId();
+        IEnumerable<Game> game = await gameService.GetAllAsync(userId, cancellationToken);
 
         GamesResponseDto gameResponse = game.MapToResponse();
 
@@ -60,7 +63,8 @@ public class GamesController(IGameService gameService) : ControllerBase
     public async Task<ActionResult<GameResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
     {
         Game game = updateGameRequest.MapToGame(id);
-        Game? wasUpdated = await gameService.UpdateAsync(game, cancellationToken);
+        Guid? userId = HttpContext.GetUserId();
+        Game? wasUpdated = await gameService.UpdateAsync(game, userId, cancellationToken);
 
         if (wasUpdated == null)
         {

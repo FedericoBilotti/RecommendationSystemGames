@@ -32,14 +32,18 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         return result > 0;
     }
 
-    public async Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
+    public async Task<Game?> GetByIdAsync(Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var game = await connection.QueryFirstOrDefaultAsync<Game>(new CommandDefinition("""
-                                                                                         SELECT * FROM games
-                                                                                         WHERE gameId = @gameId
-                                                                                         """, new { gameId }, cancellationToken: cancellationToken));
+                                                                                         SELECT g.*, ROUND(AVG(r.rating), 2) as rating, myr.rating as UserRating
+                                                                                         FROM games g
+                                                                                         LEFT JOIN ratings r on g.gameId = r.gameId
+                                                                                         LEFT JOIN ratings myr on g.gameId = myr.gameId AND myr.userId = @userId
+                                                                                         WHERE g.gameId = @gameId
+                                                                                         GROUP BY g.gameId, UserRating
+                                                                                         """, new { gameId, userId }, cancellationToken: cancellationToken));
 
         if (game == null) return null;
 
@@ -56,14 +60,18 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         return game;
     }
 
-    public async Task<Game?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<Game?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var game = await connection.QueryFirstOrDefaultAsync<Game>(new CommandDefinition("""
-                                                                                         SELECT * FROM games
-                                                                                         WHERE slug = @slug
-                                                                                         """, new { slug }, cancellationToken: cancellationToken));
+                                                                                         SELECT g.*, ROUND(AVG(r.rating), 2) as rating, myr.rating as UserRating
+                                                                                         FROM games g
+                                                                                         LEFT JOIN ratings r on g.gameId = r.gameId
+                                                                                         LEFT JOIN ratings myr on g.gameId = myr.gameId AND myr.userId = @userId
+                                                                                         WHERE g.gameId = @gameId
+                                                                                         GROUP BY g.gameId, UserRating
+                                                                                         """, new { slug, userId }, cancellationToken: cancellationToken));
 
         if (game == null) return null;
 
@@ -80,17 +88,18 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         return game;
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Game>> GetAllAsync(Guid? userId = default, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
         var games = await connection.QueryAsync(new CommandDefinition("""
-                                                                      SELECT gam.*, string_agg(gen.name, ', ') as genres
+                                                                      SELECT gam.*, string_agg(DISTINCT gen.name, ', ') as genres, ROUND(AVG(rat.rating), 2) as rating, myrat.rating as UserRating
                                                                       FROM games as gam
-                                                                      LEFT JOIN genres as gen
-                                                                          ON gam.gameId = gen.gameId
+                                                                      LEFT JOIN genres as gen ON gam.gameId = gen.gameId
+                                                                      LEFT JOIN ratings as rat ON gam.gameId = rat.gameId
+                                                                      LEFT JOIN ratings as myrat ON gam.gameId = myrat.gameId AND myrat.userId = @userId
                                                                       GROUP BY gam.gameId
-                                                                      """, cancellationToken: cancellationToken));
+                                                                      """, new { userId }, cancellationToken: cancellationToken));
 
         return games.Select(g => new Game
         {
@@ -98,6 +107,8 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
             Title = g.title,
             YearOfRelease = g.yearofrelease,
             Description = g.description,
+            Rating = (float?)g.rating,
+            UserRating = (int?)g.userrating,
             Genres = Enumerable.ToList(g.genres.Split(','))
         });
     }

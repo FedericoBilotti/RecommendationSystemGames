@@ -29,5 +29,13 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                       gameId UUID REFERENCES games(gameId),
                                       name TEXT NOT NULL);
                                       """);
+        
+        await connection.ExecuteAsync("""
+                                      CREATE TABLE IF NOT EXISTS ratings (
+                                      userId UUID,
+                                      gameId UUID REFERENCES games(gameId),
+                                      rating INTEGER NOT NULL,
+                                      PRIMARY KEY (userId, gameId));
+                                      """);
     }
 }

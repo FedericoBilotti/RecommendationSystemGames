@@ -28,7 +28,7 @@ public class GameValidator : AbstractValidator<Game>
 
     private async Task<bool> ValidateSlug(Game game, string slug, CancellationToken cancellationToken = default)
     {
-        Game? existingGame = await _gameRepository.GetBySlugAsync(slug, cancellationToken);
+        Game? existingGame = await _gameRepository.GetBySlugAsync(slug, cancellationToken: cancellationToken);
 
         if (existingGame != null)
         {

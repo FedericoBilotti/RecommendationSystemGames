@@ -28,6 +28,7 @@ public static class DependenciesConfig
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
+        builder.Services.AddScoped<IRatingRepository, RatingRepository>();
         builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         
         // Authentication 

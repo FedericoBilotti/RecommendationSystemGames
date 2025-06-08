@@ -8,7 +8,10 @@ public class Game
     public required string Title { get; init; }
     public required string Description { get; init; }
     public required int YearOfRelease { get; init; }
-    public int UserRating { get; init; }
+    
+    public float? Rating { get; set; }
+    public int? UserRating { get; set; }
+    
     public required List<string> Genres { get; init; } = new();
 
     public string Slug => GenerateSlug();

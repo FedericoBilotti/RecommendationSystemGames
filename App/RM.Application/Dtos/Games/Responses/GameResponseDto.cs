@@ -7,6 +7,9 @@ public class GameResponseDto
     public required string Description { get; init; }
     public required string Slug { get; init; }
     public required int YearOfRelease { get; init; }
-    public int UserRating { get; set; }
+    
+    public float? Rating { get; init; }
+    public int? UserRating { get; init; }
+    
     public required IEnumerable<string> Genre { get; init; } = Enumerable.Empty<string>();
 }

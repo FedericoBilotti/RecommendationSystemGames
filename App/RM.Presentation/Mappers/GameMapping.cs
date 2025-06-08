@@ -39,11 +39,9 @@ public static class GameMapping
             Description = game.Description,
             Slug = game.Slug,
             YearOfRelease = game.YearOfRelease,
-            Genre = game.Genres
+            Genre = game.Genres,
+            UserRating = game.UserRating
         };
-        
-        if (game.UserRating != 0)
-            gameResponse.UserRating = game.UserRating;
         
         return gameResponse;
     }

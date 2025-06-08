@@ -1,11 +1,10 @@
 using App.Interfaces.Engine;
-using App.Validators;
 using FluentValidation;
 using RM.Domain.Entities.Games;
 
 namespace App.Services.Engine;
 
-public class GameService(IGamesRepository gamesRepository, IValidator<Game> gameValidator) : IGameService
+public class GameService(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidator) : IGameService
 {
     public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
     {
@@ -14,17 +13,17 @@ public class GameService(IGamesRepository gamesRepository, IValidator<Game> game
         return await gamesRepository.CreateAsync(game, cancellationToken);
     }
 
-    public Task<Game?> GetByIdAsync(Guid gameId, CancellationToken cancellationToken = default)
+    public Task<Game?> GetByIdAsync(Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
     {
-        return gamesRepository.GetByIdAsync(gameId, cancellationToken);
+        return gamesRepository.GetByIdAsync(gameId, userId, cancellationToken);
     }
 
-    public Task<Game?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    public Task<Game?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cancellationToken = default)
     {
-        return gamesRepository.GetBySlugAsync(slug, cancellationToken);
+        return gamesRepository.GetBySlugAsync(slug, userId, cancellationToken);
     }
 
-    public async Task<Game?> UpdateAsync(Game game, CancellationToken cancellationToken = default)
+    public async Task<Game?> UpdateAsync(Game game, Guid? userId = default, CancellationToken cancellationToken = default)
     {
         await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
         
@@ -33,6 +32,17 @@ public class GameService(IGamesRepository gamesRepository, IValidator<Game> game
         if (!movieExists) return null;
         
         await gamesRepository.UpdateAsync(game, cancellationToken);
+
+        if (!userId.HasValue)
+        {
+            float? rating = await ratingRepository.GetRatingAsync(game.GameId, cancellationToken);
+            game.Rating = rating;
+            return game;
+        }
+
+        (float? Rating, int? User) ratings = await ratingRepository.GetUserRatingAsync(game.GameId, userId.Value, cancellationToken);
+        game.Rating = ratings.Rating;
+        game.UserRating = ratings.User;
         return game;
     }
 
@@ -41,8 +51,8 @@ public class GameService(IGamesRepository gamesRepository, IValidator<Game> game
         return gamesRepository.DeleteByIdAsync(gameId, cancellationToken);
     }
 
-    public Task<IEnumerable<Game>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IEnumerable<Game>> GetAllAsync(Guid? userId = default, CancellationToken cancellationToken = default)
     {
-        return gamesRepository.GetAllAsync(cancellationToken);
+        return gamesRepository.GetAllAsync(userId, cancellationToken);
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RM.Infrastructure.Database;
 using RM.Presentation;
+using RM.Presentation.Auth;
 using RM.Presentation.StartUp;
 
 var builder = WebApplication.CreateBuilder(args);
