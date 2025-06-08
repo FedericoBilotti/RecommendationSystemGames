@@ -6,6 +6,20 @@ namespace RM.Infrastructure.Data;
 
 public class RatingRepository(IDbConnectionFactory connectionFactory) : IRatingRepository
 {
+    public async Task<bool> RateGameAsync(Guid gameId, int rating, Guid userId, CancellationToken cancellationToken = default)
+    {
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
+
+        var result = await connection.ExecuteAsync(new CommandDefinition("""
+                                                                            INSERT INTO ratings (gameId, userId, rating)
+                                                                            VALUES (@gameId, @userId, @rating)
+                                                                            ON CONFLICT (gameId, userId) 
+                                                                            DO UPDATE SET rating = @rating
+                                                                         """, new { gameId, userId, rating }, cancellationToken: cancellationToken));
+
+        return result > 0;
+    }
+
     public async Task<float?> GetRatingAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
