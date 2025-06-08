@@ -19,7 +19,7 @@ public static class ApiEndpoints
             public const string DELETE = $"{BASE}/{{id:guid}}";
             
             public const string RATE = $"{BASE}/{{gameId:guid}}/ratings";
-            public const string DELETE_RATE = $"{BASE}/{{id:guid}}/ratings";
+            public const string DELETE_RATE = $"{BASE}/{{gameId:guid}}/ratings";
         }
 
         public static class Ratings

@@ -23,12 +23,12 @@ public class RatingRepository(IDbConnectionFactory connectionFactory) : IRatingR
     public async Task<float?> GetRatingAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
-        
+
         return await connection.QuerySingleOrDefaultAsync<float?>(new CommandDefinition("""
-                                                                                         SELECT ROUND(AVG(r.rating), 1)
-                                                                                         FROM ratings r
-                                                                                         WHERE gameId = @gameId
-                                                                                         """, new { gameId }, cancellationToken: cancellationToken));
+                                                                                        SELECT ROUND(AVG(r.rating), 1)
+                                                                                        FROM ratings r
+                                                                                        WHERE gameId = @gameId
+                                                                                        """, new { gameId }, cancellationToken: cancellationToken));
     }
 
     public async Task<(float? Rating, int? User)> GetUserRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default)
@@ -42,5 +42,17 @@ public class RatingRepository(IDbConnectionFactory connectionFactory) : IRatingR
                                                                                                            FROM ratings 
                                                                                                            WHERE gameId = @gameId
                                                                                                            """, new { gameId, userId }, cancellationToken: cancellationToken));
+    }
+
+    public async Task<bool> DeleteRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
+
+        int result = await connection.ExecuteAsync(new CommandDefinition("""
+                                                                         DELETE FROM ratings
+                                                                         WHERE gameId = @gameId AND userId = @userId
+                                                                         """, new { gameId, userId }, cancellationToken: cancellationToken));
+
+        return result > 0;
     }
 }

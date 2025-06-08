@@ -18,4 +18,13 @@ public class RatingController(IRatingService ratingService) : ControllerBase
         bool result = await ratingService.RateGameAsync(gameId, rateGameRequestDto.Rating, userId!.Value, cancellationToken);
         return result ? Ok() : NotFound();
     }
+
+    // [Authorize]
+    [HttpDelete(ApiEndpoints.V1.Games.DELETE_RATE)]
+    public async Task<IActionResult> DeleteRating([FromRoute] Guid gameId, CancellationToken cancellationToken)
+    {
+        var userId = HttpContext.GetUserId();
+        bool result = await ratingService.DeleteRatingAsync(gameId, userId!.Value, cancellationToken);
+        return result ? Ok() : NotFound();
+    }
 }

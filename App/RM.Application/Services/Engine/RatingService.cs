@@ -25,4 +25,9 @@ public class RatingService(IRatingRepository ratingRepository, IGamesRepository 
         
         return await ratingRepository.RateGameAsync(gameId, rating, userId, cancellationToken);
     }
+
+    public Task<bool> DeleteRatingAsync(Guid gameId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return ratingRepository.DeleteRatingAsync(gameId, userId, cancellationToken);
+    }
 }
