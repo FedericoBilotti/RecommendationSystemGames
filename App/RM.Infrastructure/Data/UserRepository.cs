@@ -1,20 +1,35 @@
 using App.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Dapper;
 using RM.Domain.Entities;
-using RM.Infrastructure.Database;
 
 namespace RM.Infrastructure.Data;
 
-public class UserRepository(AppDbContext context) : IUserRepository
+public class UserRepository(IDbConnectionFactory context) : IUserRepository
 {
-    public async Task<User?> GetUserById(Guid userId)
+    public async Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+        using var connection = await context.GetConnectionAsync(cancellationToken);
+
+        var result = await connection.QueryFirstOrDefaultAsync<User>(new CommandDefinition("""
+                                                                                           SELECT *
+                                                                                           FROM users 
+                                                                                           WHERE userId = @userId
+                                                                                           """, new { userId }, cancellationToken: cancellationToken));
+        
+        return result;
+        // return await context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
-    public async Task<User?> GetUserByUsername(User requestUserRequestDto)
+    public async Task<User?> GetUserByUsername(User requestUserRequestDto, CancellationToken cancellationToken = default)
     {
-        string usernameLower = requestUserRequestDto.Username.ToLower();
-        return await context.Users.FirstOrDefaultAsync(u => u.Username == usernameLower);
+        using var connection = await context.GetConnectionAsync(cancellationToken);
+
+        var result = await connection.QueryFirstOrDefaultAsync<User>(new CommandDefinition("""
+                                                                                           SELECT *
+                                                                                           FROM users 
+                                                                                           WHERE userId = @userId
+                                                                                           """, new { userId }, cancellationToken: cancellationToken));
+        
+        return result;
     }
 }

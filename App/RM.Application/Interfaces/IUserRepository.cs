@@ -4,6 +4,6 @@ namespace App.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User?> GetUserById(Guid userId);
-    Task<User?> GetUserByUsername(User user);
+    Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default);
+    Task<User?> GetUserByUsername(User user, CancellationToken cancellationToken = default);
 }

@@ -3,6 +3,8 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/RM.Infrastructure/Data/GamesRepository.cs" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/RM.Infrastructure/Data/RatingRepository.cs" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/RM.Infrastructure/Data/UserRepository.cs" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/RM.Infrastructure/Database/DbInitializer.cs" dialect="PostgreSQL" />
+    <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>
