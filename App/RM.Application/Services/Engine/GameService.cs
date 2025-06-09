@@ -1,4 +1,7 @@
+using App.Dtos.Games.Requests;
+using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
+using App.Mappers;
 using FluentValidation;
 using RM.Domain.Entities.Games;
 
@@ -6,11 +9,14 @@ namespace App.Services.Engine;
 
 public class GameService(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidator) : IGameService
 {
-    public async Task<bool> CreateAsync(Game game, CancellationToken cancellationToken = default)
+    public async Task<GameResponseDto?> CreateAsync(CreateGameRequestDto createGameRequestDto, CancellationToken cancellationToken = default)
     {
+        Game game = createGameRequestDto.MapToGame();
         await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
         
-        return await gamesRepository.CreateAsync(game, cancellationToken);
+        bool result = await gamesRepository.CreateAsync(game, cancellationToken);
+
+        return !result ? null : game.MapToResponse();
     }
 
     public Task<Game?> GetByIdAsync(Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
@@ -23,13 +29,17 @@ public class GameService(IGamesRepository gamesRepository, IRatingRepository rat
         return gamesRepository.GetBySlugAsync(slug, userId, cancellationToken);
     }
 
-    public async Task<Game?> UpdateAsync(Game game, Guid? userId = default, CancellationToken cancellationToken = default)
+    public async Task<GameResponseDto?> UpdateAsync(UpdateGameRequestDto gameDto, Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
     {
+        Game game = gameDto.MapToGame(gameId);
         await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
         
         bool movieExists = await gamesRepository.ExistsByIdAsync(game.GameId, cancellationToken);
 
-        if (!movieExists) return null;
+        if (!movieExists)
+        {
+            return null;
+        }
         
         await gamesRepository.UpdateAsync(game, cancellationToken);
 
@@ -37,13 +47,13 @@ public class GameService(IGamesRepository gamesRepository, IRatingRepository rat
         {
             float? rating = await ratingRepository.GetRatingAsync(game.GameId, cancellationToken);
             game.Rating = rating;
-            return game;
+            return game.MapToResponse();
         }
 
         (float? Rating, int? User) ratings = await ratingRepository.GetUserRatingAsync(game.GameId, userId.Value, cancellationToken);
         game.Rating = ratings.Rating;
         game.UserRating = ratings.User;
-        return game;
+        return game.MapToResponse();
     }
 
     public Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default)

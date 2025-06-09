@@ -2,7 +2,7 @@ using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using RM.Domain.Entities.Games;
 
-namespace RM.Presentation.Mappers;
+namespace App.Mappers;
 
 public static class GameMapping
 {
@@ -18,11 +18,11 @@ public static class GameMapping
         };
     }
 
-    public static Game MapToGame(this UpdateGameRequestDto updateGameRequestDto, Guid id)
+    public static Game MapToGame(this UpdateGameRequestDto updateGameRequestDto, Guid gameId)
     {
         return new Game
         {
-            GameId = id,
+            GameId = gameId,
             Title = updateGameRequestDto.Title,
             Description = updateGameRequestDto.Description,
             YearOfRelease = updateGameRequestDto.YearOfRelease,

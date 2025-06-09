@@ -1,6 +1,7 @@
 using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
+using App.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using RM.Domain.Entities.Games;
 using RM.Presentation.Mappers;
@@ -17,25 +18,21 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
-        Game game = createGameRequest.MapToGame();
-        bool wasCreated = await gameService.CreateAsync(game, cancellationToken);
+        GameResponseDto? gameResponseDto = await gameService.CreateAsync(createGameRequest, cancellationToken);
 
-        if (!wasCreated)
+        if (gameResponseDto == null)
         {
             return BadRequest("Game already exists");
         }
-
-        GameResponseDto gameResponse = game.MapToResponse();
-        return CreatedAtAction(nameof(Get), new { idOrSlug = game.GameId }, gameResponse);
+        
+        return CreatedAtAction(nameof(Get), new { idOrSlug = gameResponseDto.GameId }, gameResponseDto);
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET)]
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) 
-                ? await gameService.GetByIdAsync(gameId, userId, cancellationToken) 
-                : await gameService.GetBySlugAsync(idOrSlug, userId, cancellationToken);
+        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) ? await gameService.GetByIdAsync(gameId, userId, cancellationToken) : await gameService.GetBySlugAsync(idOrSlug, userId, cancellationToken);
 
         if (game == null)
         {
@@ -59,19 +56,19 @@ public class GamesController(IGameService gameService) : ControllerBase
 
     [Authorize(AuthConstants.TRUSTED_ROLE)]
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
-    public async Task<ActionResult<GameResponseDto>> Update([FromRoute] Guid id, [FromBody] UpdateGameRequestDto updateGameRequest, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameResponseDto>> Update([FromBody] UpdateGameRequestDto updateGameRequest, [FromRoute] Guid gameId, CancellationToken cancellationToken = default)
     {
-        Game game = updateGameRequest.MapToGame(id);
+        // Maybe there is a problem if i dont map before
+        // Game game = updateGameRequest.MapToGame(id);
         Guid? userId = HttpContext.GetUserId();
-        Game? wasUpdated = await gameService.UpdateAsync(game, userId, cancellationToken);
+        GameResponseDto? gameResponseDto = await gameService.UpdateAsync(updateGameRequest, gameId, userId, cancellationToken);
 
-        if (wasUpdated == null)
+        if (gameResponseDto == null)
         {
             return NotFound("Game not found");
         }
 
-        GameResponseDto gameResponse = wasUpdated.MapToResponse();
-        return Ok(gameResponse);
+        return Ok(gameResponseDto);
     }
 
     [Authorize(AuthConstants.ADMIN_ROLE)]
