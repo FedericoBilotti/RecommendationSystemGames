@@ -20,7 +20,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
         // return await context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
-    public async Task<User?> GetUserByUsername(User requestUserRequestDto, CancellationToken cancellationToken = default)
+    public async Task<User?> GetUserByUsername(string username, CancellationToken cancellationToken = default)
     {
         using var connection = await context.GetConnectionAsync(cancellationToken);
 
@@ -28,7 +28,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
                                                                                            SELECT *
                                                                                            FROM users 
                                                                                            WHERE userId = @userId
-                                                                                           """, new { userId }, cancellationToken: cancellationToken));
+                                                                                           """, new { username }, cancellationToken: cancellationToken));
         
         return result;
     }

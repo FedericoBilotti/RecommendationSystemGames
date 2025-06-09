@@ -20,7 +20,7 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                           email TEXT NOT NULL,
                                           username TEXT NOT NULL,
                                           hashedPassword TEXT NOT NULL,
-                                          role TEXT NOT NULL,
+                                          role TEXT NOT NULL
                                       )
                                       """);
     }

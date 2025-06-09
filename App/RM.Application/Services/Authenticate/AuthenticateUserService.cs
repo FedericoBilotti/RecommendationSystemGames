@@ -15,7 +15,7 @@ public class AuthenticateUserService(IUserRepository userRepository, IPasswordHa
         // User user = requestUserRequestDto.MapToUserExists();
         User user = new User();
         
-        bool isValid = await userRepository.GetUserByUsername(user) != null;
+        bool isValid = await userRepository.GetUserByUsername(requestUserRequestDto.Username) != null;
         
         if (isValid) return null; // Throw an error
 
