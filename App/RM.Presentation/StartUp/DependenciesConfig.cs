@@ -7,7 +7,6 @@ using App.UseCases.Authentication;
 using App.UseCases.Engine;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
@@ -22,7 +21,6 @@ public static class DependenciesConfig
         
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
-        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
         
