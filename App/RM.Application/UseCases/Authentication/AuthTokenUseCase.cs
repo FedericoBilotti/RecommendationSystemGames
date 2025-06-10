@@ -8,13 +8,13 @@ namespace App.UseCases.Authentication;
 
 public class AuthTokenUseCase(ITokenService tokenService)
 {
-    public async Task<TokenResponseDto> CreateTokenResponse(User user)
+    public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
-        return await tokenService.CreateTokenResponse(user);
+        return await tokenService.CreateTokenResponse(user, cancellationToken);
     }
     
-    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
+    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken = default)
     {
-        return await tokenService.RefreshTokenAsync(requestRefreshTokenDto);
+        return await tokenService.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
     }
 }

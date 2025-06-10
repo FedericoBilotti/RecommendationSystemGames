@@ -31,7 +31,9 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) ? await gameUseCase.GetByIdAsync(gameId, userId, cancellationToken) : await gameUseCase.GetBySlugAsync(idOrSlug, userId, cancellationToken);
+        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) 
+                ? await gameUseCase.GetByIdAsync(gameId, userId, cancellationToken) 
+                : await gameUseCase.GetBySlugAsync(idOrSlug, userId, cancellationToken);
 
         if (game == null)
         {

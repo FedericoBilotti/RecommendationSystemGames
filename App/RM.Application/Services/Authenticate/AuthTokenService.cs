@@ -14,7 +14,7 @@ namespace App.Services.Authenticate;
 
 public class AuthTokenService(IUserRepository userRepository, IConfiguration configuration) : ITokenService
 {
-    public async Task<TokenResponseDto> CreateTokenResponse(User user)
+    public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
         return new TokenResponseDto
         {
@@ -23,13 +23,13 @@ public class AuthTokenService(IUserRepository userRepository, IConfiguration con
         };
     }
 
-    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
+    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken = default)
     {
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);
 
         if (user == null) return null;
 
-        return await CreateTokenResponse(user);
+        return await CreateTokenResponse(user, cancellationToken);
     }
 
     private async Task<User?> ValidateRefreshToken(Guid userId, string refreshToken)

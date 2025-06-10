@@ -7,26 +7,28 @@ namespace App.Mappers;
 
 public static class UserMapping
 {
-    public static User MapToNewUser(this UserRequestDto userRequestDto)
+    public static User MapToUser(this UserRegisterRequestDto userLoginRequestDto, IPasswordHasher<UserRegisterRequestDto> hasher)
     {
         return new User
         {
             UserId = Guid.NewGuid(),
-            Username = userRequestDto.Username,
-            Email = userRequestDto.Email,
+            Username = userLoginRequestDto.Username,
+            Email = userLoginRequestDto.Email,
+            HashedPassword = hasher.HashPassword(userLoginRequestDto, userLoginRequestDto.Password)
         };
     }
-    
-    public static User MapToUser(this UserRequestDto user, IPasswordHasher<UserRequestDto> hasher)
+
+    public static User MapToUser(this UserLoginRequestDto userLogin, Guid userId)
     {
         return new User
         {
-            Username = user.Username,
-            Email = user.Email,
-            HashedPassword = hasher.HashPassword(user, user.Password)
+            UserId = userId,
+            Username = userLogin.Username!,
+            Email = userLogin.Email!,
+            HashedPassword = userLogin.Password
         };
     }
-    
+
     public static UserResponseDto MapToUserResponse(this User user)
     {
         return new UserResponseDto

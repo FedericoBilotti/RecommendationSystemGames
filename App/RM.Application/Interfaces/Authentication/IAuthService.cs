@@ -6,6 +6,6 @@ namespace App.Interfaces.Authentication;
 
 public interface IAuthService
 {
-    Task<User?> RegisterAsync(User requestUserRequestDto);
-    Task<TokenResponseDto?> LoginAsync(UserRequestDto requestUserRequestDto);
+    Task<User?> RegisterAsync(User requestUserRequestDto, CancellationToken cancellationToken = default);
+    Task<TokenResponseDto?> LoginAsync(UserLoginRequestDto loginRequestUserLoginRequestDto, CancellationToken cancellationToken = default);
 }

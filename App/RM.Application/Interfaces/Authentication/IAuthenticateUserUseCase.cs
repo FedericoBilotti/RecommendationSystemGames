@@ -7,7 +7,7 @@ namespace App.Interfaces.Authentication;
 
 public interface IAuthenticateUserUseCase
 {
-    Task<UserResponseDto?> RegisterAsync(UserRequestDto userRequestDto);
-    Task<TokenResponseDto?> LoginAsync(UserRequestDto request);
-    Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request);
+    Task<UserResponseDto?> RegisterAsync(UserRegisterRequestDto userLoginRequestDto, CancellationToken cancellationToken = default);
+    Task<TokenResponseDto?> LoginAsync(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default);
+    Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,7 @@ using App.Interfaces.Engine;
 using FluentValidation;
 using RM.Domain.Entities.Games;
 
-namespace App.Services.Validators;
+namespace App.Services.Validators.Games;
 
 public class GameValidatorService : AbstractValidator<Game>
 {

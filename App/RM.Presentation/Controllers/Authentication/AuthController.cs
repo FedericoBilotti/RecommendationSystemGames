@@ -1,10 +1,10 @@
-using App.Dtos.Authentication;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RM.Domain.Entities;
+using RM.Presentation.Auth;
 using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Authentication;
@@ -13,9 +13,9 @@ namespace RM.Presentation.Controllers.Authentication;
 public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBase
 {
     [HttpPost(AuthEndpoints.Auth.REGISTER)]
-    public async Task<ActionResult<User>> Register(UserRequestDto requestUserRequestDto)
+    public async Task<ActionResult<User>> Register([FromBody] UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken)
     {
-        UserResponseDto? userResponseDto = await authUseCase.RegisterAsync(requestUserRequestDto);
+        UserResponseDto? userResponseDto = await authUseCase.RegisterAsync(userRegisterRequestDto, cancellationToken);
 
         if (userResponseDto == null)
         {
@@ -26,9 +26,9 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
-    public async Task<ActionResult<string>> Login(UserRequestDto requestUserRequestDto)
+    public async Task<ActionResult<string>> Login(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
     {
-        TokenResponseDto? tokenResult = await authUseCase.LoginAsync(requestUserRequestDto);
+        TokenResponseDto? tokenResult = await authUseCase.LoginAsync(userLoginRequestDto, cancellationToken);
 
         if (tokenResult == null)
         {
@@ -39,9 +39,9 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto)
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken)
     {
-        TokenResponseDto? result = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto);
+        TokenResponseDto? result = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
 
         if (result?.AccessToken == null || result?.RefreshToken == null)
         {

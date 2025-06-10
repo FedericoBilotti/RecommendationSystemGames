@@ -2,7 +2,7 @@ using App.Interfaces;
 using FluentValidation;
 using RM.Domain.Entities;
 
-namespace App.Services.Validators;
+namespace App.Services.Validators.Users;
 
 public class UserValidatorService : AbstractValidator<User>
 {

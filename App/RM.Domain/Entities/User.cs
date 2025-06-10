@@ -2,10 +2,10 @@ namespace RM.Domain.Entities;
 
 public class User
 {
-    public Guid UserId { get; init; }
-    public string Email { get; init; }
-    public string Username { get; init; }
-    public string HashedPassword { get; init; }
+    public required Guid UserId { get; init; }
+    public required string Email { get; init; }
+    public required string Username { get; init; }
+    public required string HashedPassword { get; init; }
     
     public bool TrustedUser { get; init; }
     public string Role { get; init; }
