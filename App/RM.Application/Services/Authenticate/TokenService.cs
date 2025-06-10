@@ -12,7 +12,7 @@ using RM.Domain.Entities;
 
 namespace App.Services.Authenticate;
 
-public class AuthTokenService(IUserRepository userRepository, IConfiguration configuration) : ITokenService
+public class TokenService(IUserRepository userRepository, IConfiguration configuration) : ITokenService
 {
     public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {

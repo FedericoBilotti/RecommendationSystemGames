@@ -4,7 +4,6 @@ using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RM.Domain.Entities;
-using RM.Presentation.Auth;
 using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Authentication;
@@ -26,7 +25,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
-    public async Task<ActionResult<string>> Login(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<string>> Login([FromBody] UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
     {
         TokenResponseDto? tokenResult = await authUseCase.LoginAsync(userLoginRequestDto, cancellationToken);
 
@@ -39,7 +38,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken)
     {
         TokenResponseDto? result = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
 
