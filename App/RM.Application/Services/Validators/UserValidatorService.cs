@@ -33,8 +33,10 @@ public class UserValidatorService : AbstractValidator<User>
         
         RuleFor(x => x.HashedPassword)
                 .NotEmpty()
-                .MinimumLength(8)
-                .MaximumLength(100);
+                .MinimumLength(5)
+                .WithMessage("The password must be at least 5 characters")
+                .MaximumLength(100)
+                .WithMessage("The password must be less than 100 characters");
     }
     
     private async Task<bool> IsUsernameUnique(User user, string username, CancellationToken cancellationToken = default)

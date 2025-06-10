@@ -23,6 +23,18 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                           role TEXT NOT NULL
                                       )
                                       """);
+        
+        await connection.ExecuteAsync("""
+                                      CREATE UNIQUE INDEX IF NOT EXISTS users_username_uindex
+                                      ON users
+                                      USING btree(username);
+                                      """);
+        
+        await connection.ExecuteAsync("""
+                                      CREATE UNIQUE INDEX IF NOT EXISTS users_email_uindex
+                                      ON users
+                                      USING btree(email);
+                                      """);
     }
 
     private async Task CreateGameTables()
