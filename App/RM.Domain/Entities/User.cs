@@ -10,5 +10,5 @@ public class User
     public bool TrustedUser { get; init; }
     public string Role { get; init; }
     public string? RefreshToken { get; set; }
-    public DateTime? RefreshTokenExpirationTime { get; set; }
+    public DateTime? RefreshTokenExpirationTimeUtc { get; set; }
 }

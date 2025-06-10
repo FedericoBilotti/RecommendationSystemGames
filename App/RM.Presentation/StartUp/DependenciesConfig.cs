@@ -25,6 +25,8 @@ public static class DependenciesConfig
         builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
+        
+        // Game
         builder.Services.AddScoped<IGameUseCase, GameUseCase>();
         builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -33,7 +35,6 @@ public static class DependenciesConfig
         builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         
         // Authentication 
-        builder.Services.AddScoped<IAuthService, AuthenticateUserService>();
         builder.Services.AddScoped<ITokenService, AuthTokenService>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 

@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using App.Dtos.Authentication;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces;
@@ -36,7 +35,7 @@ public class AuthTokenService(IUserRepository userRepository, IConfiguration con
     private async Task<User?> ValidateRefreshToken(Guid userId, string refreshToken)
     {
         User? user = await userRepository.GetUserById(userId);
-        bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTime < DateTime.UtcNow;
+        bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTimeUtc < DateTime.UtcNow;
 
         return isNotValid ? null : user;
     }
@@ -45,7 +44,7 @@ public class AuthTokenService(IUserRepository userRepository, IConfiguration con
     {
         string refreshToken = GenerateRefreshToken();
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpirationTime = DateTime.UtcNow.AddMinutes(30);
+        user.RefreshTokenExpirationTimeUtc = DateTime.UtcNow.AddMinutes(30);
         
         // await context.SaveChangesAsync();
         

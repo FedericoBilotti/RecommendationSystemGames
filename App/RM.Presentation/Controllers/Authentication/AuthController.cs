@@ -15,14 +15,14 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     [HttpPost(AuthEndpoints.Auth.REGISTER)]
     public async Task<ActionResult<User>> Register(UserRequestDto requestUserRequestDto)
     {
-        User? user = await authUseCase.RegisterAsync(requestUserRequestDto);
+        UserResponseDto? userResponseDto = await authUseCase.RegisterAsync(requestUserRequestDto);
 
-        if (user == null)
+        if (userResponseDto == null)
         {
             return BadRequest("User already exists");
         }
 
-        return Created($"{AuthEndpoints.Auth.REGISTER}/{user.UserId}", user);
+        return Created($"{AuthEndpoints.Auth.REGISTER}/{userResponseDto.UserId}", userResponseDto);
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
