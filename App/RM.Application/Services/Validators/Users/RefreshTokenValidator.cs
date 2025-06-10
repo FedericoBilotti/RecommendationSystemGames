@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace App.Services.Validators.Users;
 
-public class RefreshTokenValidatorService : AbstractValidator<RefreshTokenRequestDto>
+public class RefreshTokenValidator : AbstractValidator<RefreshTokenRequestDto>
 {
-    public RefreshTokenValidatorService()
+    public RefreshTokenValidator()
     {
         RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.RefreshToken).NotEmpty();

@@ -3,8 +3,6 @@ using App.Dtos.Authentication.Response;
 using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.Mappers;
-using App.Services.Validators.Users;
-using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using RM.Domain.Entities;
 
@@ -14,15 +12,13 @@ public class AuthenticateUserUseCase(
         IUserRepository userRepository,
         ITokenService tokenService,
         IPasswordHasher<UserRegisterRequestDto> hasher,
-        IValidator<User> userValidator,
-        IValidator<UserLoginRequestDto> userLoginValidator,
-        IValidator<RefreshTokenRequestDto> userRefreshTokenValidator) : IAuthenticateUserUseCase
+        IValidationService validationService) : IAuthenticateUserUseCase
 {
     public async Task<UserResponseDto?> RegisterAsync(UserRegisterRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
         User user = userLoginRequestDto.MapToUser(hasher);
 
-        await userValidator.ValidateAndThrowAsync(user, cancellationToken);
+        await validationService.ValidateUserAndThrowAsync(user, cancellationToken);
 
         bool result = await userRepository.CreateUserAsync(user, cancellationToken);
 
@@ -31,7 +27,7 @@ public class AuthenticateUserUseCase(
 
     public async Task<TokenResponseDto?> LoginAsync(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
-        await userLoginValidator.ValidateAndThrowAsync(userLoginRequestDto, cancellationToken);
+        await validationService.ValidateLoginAndThrowAsync(userLoginRequestDto, cancellationToken);
 
         User? res = userLoginRequestDto.Email != null
                 ? await userRepository.GetUserByEmail(userLoginRequestDto.Email, cancellationToken)
@@ -44,7 +40,7 @@ public class AuthenticateUserUseCase(
 
     public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken = default)
     {
-        await userRefreshTokenValidator.ValidateAndThrowAsync(refreshTokenRequestDto, cancellationToken);
+        await validationService.ValidateTokenAndThrowAsync(refreshTokenRequestDto, cancellationToken);
         
         return await tokenService.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
     }

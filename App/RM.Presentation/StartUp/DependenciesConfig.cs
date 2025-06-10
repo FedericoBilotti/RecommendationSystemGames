@@ -3,6 +3,7 @@ using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.Interfaces.Engine;
 using App.Services.Authenticate;
+using App.Services.Validators.Users;
 using App.UseCases.Authentication;
 using App.UseCases.Engine;
 using FluentValidation;
@@ -33,6 +34,7 @@ public static class DependenciesConfig
         builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         
         // Authentication 
+        builder.Services.AddScoped<IValidationService, UserValidationService>();
         builder.Services.AddScoped<ITokenService, AuthTokenService>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 

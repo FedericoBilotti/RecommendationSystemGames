@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace App.Services.Validators.Users;
 
-public class UserLoginValidatorService : AbstractValidator<UserLoginRequestDto>
+public class UserLoginValidator : AbstractValidator<UserLoginRequestDto>
 {
-    public UserLoginValidatorService()
+    public UserLoginValidator()
     {
         RuleFor(x => x)
                 .Must(x => !string.IsNullOrWhiteSpace(x.Email) || !string.IsNullOrWhiteSpace(x.Username))

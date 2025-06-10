@@ -4,11 +4,11 @@ using RM.Domain.Entities;
 
 namespace App.Services.Validators.Users;
 
-public class UserValidatorService : AbstractValidator<User>
+public class UserValidator : AbstractValidator<User>
 {
     private readonly IUserRepository _userRepository;
     
-    public UserValidatorService(IUserRepository userRepository)
+    public UserValidator(IUserRepository userRepository)
     {
         _userRepository = userRepository;
         
