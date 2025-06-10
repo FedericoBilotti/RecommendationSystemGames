@@ -3,9 +3,9 @@ using FluentValidation;
 using FluentValidation.Results;
 using RM.Domain.Entities.Games;
 
-namespace App.Services.Engine;
+namespace App.UseCases.Engine;
 
-public class RatingService(IRatingRepository ratingRepository, IGamesRepository gamesRepository) : IRatingService
+public class RatingUseCase(IRatingRepository ratingRepository, IGamesRepository gamesRepository) : IRatingUseCase
 {
     public async Task<bool> RateGameAsync(Guid gameId, int rating, Guid userId, CancellationToken cancellationToken = default)
     {

@@ -5,18 +5,18 @@ using App.Mappers;
 using FluentValidation;
 using RM.Domain.Entities.Games;
 
-namespace App.Services.Engine;
+namespace App.UseCases.Engine;
 
-public class GameService(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidator) : IGameService
+public class GameUseCase(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidatorService) : IGameUseCase
 {
     public async Task<GameResponseDto?> CreateAsync(CreateGameRequestDto createGameRequestDto, CancellationToken cancellationToken = default)
     {
         Game game = createGameRequestDto.MapToGame();
-        await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
+        await gameValidatorService.ValidateAndThrowAsync(game, cancellationToken);
         
-        bool result = await gamesRepository.CreateAsync(game, cancellationToken);
+        bool gameWasCreated = await gamesRepository.CreateAsync(game, cancellationToken);
 
-        return !result ? null : game.MapToResponse();
+        return gameWasCreated ? game.MapToResponse() : null;
     }
 
     public Task<Game?> GetByIdAsync(Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
@@ -32,7 +32,7 @@ public class GameService(IGamesRepository gamesRepository, IRatingRepository rat
     public async Task<GameResponseDto?> UpdateAsync(UpdateGameRequestDto gameDto, Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default)
     {
         Game game = gameDto.MapToGame(gameId);
-        await gameValidator.ValidateAndThrowAsync(game, cancellationToken);
+        await gameValidatorService.ValidateAndThrowAsync(game, cancellationToken);
         
         bool movieExists = await gamesRepository.ExistsByIdAsync(game.GameId, cancellationToken);
 

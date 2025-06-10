@@ -2,13 +2,13 @@ using App.Interfaces.Engine;
 using FluentValidation;
 using RM.Domain.Entities.Games;
 
-namespace App.Validators;
+namespace App.Services.Validators;
 
-public class GameValidator : AbstractValidator<Game>
+public class GameValidatorService : AbstractValidator<Game>
 {
     private readonly IGamesRepository _gameRepository;
 
-    public GameValidator(IGamesRepository gameRepository)
+    public GameValidatorService(IGamesRepository gameRepository)
     {
         _gameRepository = gameRepository;
         

@@ -3,8 +3,8 @@ using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.Interfaces.Engine;
 using App.Services.Authenticate;
-using App.Services.Engine;
 using App.UseCases.Authentication;
+using App.UseCases.Engine;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +25,8 @@ public static class DependenciesConfig
         builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString)); // It's not in use.
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
-        builder.Services.AddScoped<IGameService, GameService>();
-        builder.Services.AddScoped<IRatingService, RatingService>();
+        builder.Services.AddScoped<IGameUseCase, GameUseCase>();
+        builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
         builder.Services.AddScoped<IRatingRepository, RatingRepository>();

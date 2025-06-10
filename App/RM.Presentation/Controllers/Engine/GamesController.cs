@@ -12,13 +12,13 @@ using RM.Presentation.Auth;
 namespace RM.Presentation.Controllers.Engine;
 
 [ApiController]
-public class GamesController(IGameService gameService) : ControllerBase
+public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 {
     [Authorize(AuthConstants.TRUSTED_ROLE)]
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
-        GameResponseDto? gameResponseDto = await gameService.CreateAsync(createGameRequest, cancellationToken);
+        GameResponseDto? gameResponseDto = await gameUseCase.CreateAsync(createGameRequest, cancellationToken);
 
         if (gameResponseDto == null)
         {
@@ -32,7 +32,7 @@ public class GamesController(IGameService gameService) : ControllerBase
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) ? await gameService.GetByIdAsync(gameId, userId, cancellationToken) : await gameService.GetBySlugAsync(idOrSlug, userId, cancellationToken);
+        Game? game = Guid.TryParse(idOrSlug, out Guid gameId) ? await gameUseCase.GetByIdAsync(gameId, userId, cancellationToken) : await gameUseCase.GetBySlugAsync(idOrSlug, userId, cancellationToken);
 
         if (game == null)
         {
@@ -47,7 +47,7 @@ public class GamesController(IGameService gameService) : ControllerBase
     public async Task<ActionResult<GamesResponseDto>> GetAll(CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        IEnumerable<Game> game = await gameService.GetAllAsync(userId, cancellationToken);
+        IEnumerable<Game> game = await gameUseCase.GetAllAsync(userId, cancellationToken);
 
         GamesResponseDto gameResponse = game.MapToResponse();
 
@@ -61,7 +61,7 @@ public class GamesController(IGameService gameService) : ControllerBase
         // Maybe there is a problem if i dont map before
         // Game game = updateGameRequest.MapToGame(id);
         Guid? userId = HttpContext.GetUserId();
-        GameResponseDto? gameResponseDto = await gameService.UpdateAsync(updateGameRequest, gameId, userId, cancellationToken);
+        GameResponseDto? gameResponseDto = await gameUseCase.UpdateAsync(updateGameRequest, gameId, userId, cancellationToken);
 
         if (gameResponseDto == null)
         {
@@ -75,7 +75,7 @@ public class GamesController(IGameService gameService) : ControllerBase
     [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
-        bool wasDeleted = await gameService.DeleteByIdAsync(id, cancellationToken);
+        bool wasDeleted = await gameUseCase.DeleteByIdAsync(id, cancellationToken);
 
         if (!wasDeleted)
         {

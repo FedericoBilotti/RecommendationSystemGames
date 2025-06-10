@@ -23,7 +23,7 @@ public class AuthTokenService(IUserRepository userRepository, IConfiguration con
             RefreshToken = await GenerateAndSaveRefreshToken(user)
         };
     }
-    
+
     public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto)
     {
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);

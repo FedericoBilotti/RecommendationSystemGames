@@ -4,7 +4,7 @@ using RM.Domain.Entities.Games;
 
 namespace App.Interfaces.Engine;
 
-public interface IGameService
+public interface IGameUseCase
 {
     Task<GameResponseDto?> CreateAsync(CreateGameRequestDto game, CancellationToken cancellationToken = default);
     Task<Game?> GetByIdAsync(Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default);

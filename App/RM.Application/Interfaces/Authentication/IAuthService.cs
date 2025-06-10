@@ -1,4 +1,3 @@
-using App.Dtos.Authentication;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using RM.Domain.Entities;
