@@ -7,8 +7,8 @@ public class User
     public required string Username { get; init; }
     public required string HashedPassword { get; init; }
     public required string Role { get; init; }
+    public required bool TrustedUser { get; init; }
     
-    public bool TrustedUser { get; init; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpirationTimeUtc { get; set; }
 }

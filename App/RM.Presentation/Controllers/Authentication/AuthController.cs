@@ -49,7 +49,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
         var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
         
-        if (tokenResponseDto.Item1?.AccessToken == null || tokenResponseDto.Item1?.RefreshToken == null)
+        if (tokenResponseDto.AccessToken == null || tokenResponseDto.RefreshToken == null)
         {
             return Unauthorized("Refresh token is invalid");
         }

@@ -11,8 +11,8 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
         using var connection = await context.GetConnectionAsync(cancellationToken);
 
         int result = await connection.ExecuteAsync(new CommandDefinition("""
-                                                                         INSERT INTO users (userid, email, username, hashedPassword, role)
-                                                                         VALUES (@userId, @email, @username, @hashedPassword, @role)
+                                                                         INSERT INTO users (userid, email, username, hashedPassword, role, trustedUser)
+                                                                         VALUES (@userId, @email, @username, @hashedPassword, @role, @trustedUser)
                                                                          """, user, cancellationToken: cancellationToken));
 
         return result > 0;

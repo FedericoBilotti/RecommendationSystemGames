@@ -6,7 +6,6 @@ namespace App.Interfaces.Authentication;
 
 public interface ITokenService
 {
-    Task<(TokenResponseDto, DateTime)> CreateTokenResponse(User user, CancellationToken cancellationToken = default);
-    Task<(TokenResponseDto, DateTime)> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default);
-    void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration);
+    Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default);
+    Task<TokenResponseDto?> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default);
 }

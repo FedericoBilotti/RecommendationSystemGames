@@ -15,7 +15,8 @@ public static class UserMapping
             Username = userLoginRequestDto.Username,
             Email = userLoginRequestDto.Email,
             HashedPassword = password,
-            Role = "User"
+            Role = "User",
+            TrustedUser = false
         };
     }
     

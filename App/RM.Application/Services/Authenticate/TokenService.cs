@@ -15,26 +15,26 @@ namespace App.Services.Authenticate;
 
 public class TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ITokenService
 {
-    public async Task<(TokenResponseDto, DateTime)> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
+    public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
         (string? handler, DateTime expiresTime) generatedToken = GenerateToken(user);
         
         if (generatedToken.handler == null)
             throw new Exception("Error generating token");
         
-        return (new TokenResponseDto
+        return new TokenResponseDto
         {
             AccessToken = generatedToken.handler,
-            RefreshToken = await GenerateAndSaveRefreshToken(user, generatedToken.expiresTime, cancellationToken)
-        }, generatedToken.expiresTime);
+            RefreshToken = await GenerateAndSaveRefreshToken(user, generatedToken.handler, generatedToken.expiresTime, cancellationToken)
+        };
     }
 
-    public async Task<(TokenResponseDto, DateTime)> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default)
+    public async Task<TokenResponseDto?> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default)
     {
-        
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);
         
-        if (user == null) return (null, DateTime.MinValue)!;
+        if (user == null) 
+            return null;
         
         return await CreateTokenResponse(user, cancellationToken);
     }
@@ -58,14 +58,18 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         return isNotValid ? null : user;
     }
 
-    private async Task<string> GenerateAndSaveRefreshToken(User user, DateTime expiresTime, CancellationToken cancellationToken = default)
+    private async Task<string> GenerateAndSaveRefreshToken(User user, string accessToken, DateTime expirationDateTimeUtc, CancellationToken cancellationToken = default)
     {
         string refreshToken = GenerateRefreshToken();
+        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7); // Must be provided in other place ¿?
+        
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpirationTimeUtc = expiresTime;
-
-        // await context.SaveChangesAsync();
-        // userRepository.
+        user.RefreshTokenExpirationTimeUtc = refreshTokenExpirationDateTimeUtc;
+        
+        await UpdateUserAsync(user, cancellationToken);
+        
+        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.ACCESS_TOKEN, accessToken, expirationDateTimeUtc);
+        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.REFRESH_TOKEN, user.RefreshToken, refreshTokenExpirationDateTimeUtc);
 
         return refreshToken;
     }
@@ -91,7 +95,6 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
 
         // Change symmetric key?
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
-        
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
         var token = new JwtSecurityToken(
@@ -104,5 +107,10 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         string? handler = new JwtSecurityTokenHandler().WriteToken(token);
 
         return (handler, expires);
+    }
+
+    private async Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)
+    {
+        await userRepository.UpdateUserAsync(user, cancellationToken);
     }
 }
