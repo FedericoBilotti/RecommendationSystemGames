@@ -1,9 +1,11 @@
+using App;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RM.Domain.Entities;
+using RM.Presentation.Auth;
 using RM.Presentation.Routes;
 
 namespace RM.Presentation.Controllers.Authentication;
@@ -39,16 +41,20 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken(CancellationToken cancellationToken)
     {
-        TokenResponseDto? result = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
-
-        if (result?.AccessToken == null || result?.RefreshToken == null)
+        string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
+        Guid? id = HttpContext.GetUserId();
+        
+        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
+        var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
+        
+        if (tokenResponseDto.Item1?.AccessToken == null || tokenResponseDto.Item1?.RefreshToken == null)
         {
             return Unauthorized("Refresh token is invalid");
         }
-
-        return Ok(result);
+        
+        return Ok(tokenResponseDto);;
     }
 
     [Authorize]

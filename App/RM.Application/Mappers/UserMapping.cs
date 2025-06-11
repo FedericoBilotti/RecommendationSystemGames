@@ -18,17 +18,15 @@ public static class UserMapping
             Role = "User"
         };
     }
-
-    // public static User MapToUser(this UserLoginRequestDto userLogin, Guid userId)
-    // {
-    //     return new User
-    //     {
-    //         UserId = userId,
-    //         Username = userLogin.Username!,
-    //         Email = userLogin.Email!,
-    //         HashedPassword = userLogin.Password
-    //     };
-    // }
+    
+    public static Token MapToToken(this RefreshTokenRequestDto refreshTokenRequestDto)
+    {
+        return new Token
+        {
+            UserId = (Guid)refreshTokenRequestDto.UserId!,
+            RefreshToken = refreshTokenRequestDto.RefreshToken!
+        };
+    }
 
     public static UserResponseDto MapToUserResponse(this User user)
     {

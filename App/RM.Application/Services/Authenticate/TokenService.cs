@@ -15,26 +15,27 @@ namespace App.Services.Authenticate;
 
 public class TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ITokenService
 {
-    public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
+    public async Task<(TokenResponseDto, DateTime)> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
         (string? handler, DateTime expiresTime) generatedToken = GenerateToken(user);
         
         if (generatedToken.handler == null)
             throw new Exception("Error generating token");
         
-        return new TokenResponseDto
+        return (new TokenResponseDto
         {
             AccessToken = generatedToken.handler,
             RefreshToken = await GenerateAndSaveRefreshToken(user, generatedToken.expiresTime, cancellationToken)
-        };
+        }, generatedToken.expiresTime);
     }
 
-    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken = default)
+    public async Task<(TokenResponseDto, DateTime)> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default)
     {
+        
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);
-
-        if (user == null) return null;
-
+        
+        if (user == null) return (null, DateTime.MinValue)!;
+        
         return await CreateTokenResponse(user, cancellationToken);
     }
 
@@ -54,7 +55,6 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
     {
         User? user = await userRepository.GetUserById(userId);
         bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTimeUtc < DateTime.UtcNow;
-
         return isNotValid ? null : user;
     }
 

@@ -12,11 +12,14 @@ using App.UseCases.Engine;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
 using RM.Presentation.Auth;
+using RM.Presentation.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace RM.Presentation.StartUp;
 
@@ -26,27 +29,31 @@ public static class DependenciesConfig
     {
         builder.Services.AddOpenApiServices();
         
+        // Swagger
+        builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
         // Database
         string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
-        
+
         // Repositories
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
         builder.Services.AddScoped<IRatingRepository, RatingRepository>();
         builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
-        
+
         // Game
         builder.Services.AddScoped<IGameUseCase, GameUseCase>();
         builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
-        
+
         // Hasher
         builder.Services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         builder.Services.AddScoped<IHasherService, HasherService>();
-        
+
         // Authentication 
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IUserValidationService, UserValidationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
@@ -58,18 +65,12 @@ public static class DependenciesConfig
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy(AuthConstants.ADMIN_ROLE, policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
-            options.AddPolicy(AuthConstants.TRUSTED_ROLE, 
-                    policy => policy.RequireAssertion(x => 
-                            x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) ||
-                            x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
+            options.AddPolicy(AuthConstants.TRUSTED_ROLE,
+                    policy => policy.RequireAssertion(x =>
+                            x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) || x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
         });
 
-        builder.Services.AddAuthentication(authOptions =>
-        {
-            authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            authOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -86,7 +87,7 @@ public static class DependenciesConfig
             {
                 OnMessageReceived = context =>
                 {
-                    context.Token = context.Request.Cookies["access_token"];
+                    context.Token = context.Request.Cookies[TokenConstants.ACCESS_TOKEN];
                     return Task.CompletedTask;
                 }
             };

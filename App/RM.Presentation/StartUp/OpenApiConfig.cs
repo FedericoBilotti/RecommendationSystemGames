@@ -11,6 +11,7 @@ public static class OpenApiConfig
     
     public static void UseOpenApi(this WebApplication app)
     {
+        // I can put this and then in the docker-compose put Development
         // if (!app.Environment.IsDevelopment()) return;
         
         app.MapOpenApi();

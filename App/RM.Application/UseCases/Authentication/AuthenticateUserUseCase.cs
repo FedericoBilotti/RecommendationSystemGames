@@ -26,6 +26,7 @@ public class AuthenticateUserUseCase(
         return result ? user.MapToUserResponse() : null;
     }
 
+    // Maybe not pass the refresh token as dto, cause' it's valuable 
     public async Task<TokenResponseDto?> LoginAsync(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
         await userValidationService.ValidateLoginAndThrowAsync(userLoginRequestDto, cancellationToken);
@@ -41,27 +42,44 @@ public class AuthenticateUserUseCase(
             return null;
         }
 
-        var tokenResponseDto = await tokenService.CreateTokenResponse(user, cancellationToken);
-        
-        user.RefreshToken = tokenResponseDto.RefreshToken;
-        user.RefreshTokenExpirationTimeUtc = DateTime.UtcNow.AddDays(7);
-        
-        // Add this to the db
+        TokenResponseDto tokenResponseDto = await CreateToken(cancellationToken, user);
 
         return tokenResponseDto;
     }
 
-    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken = default)
+    private async Task<TokenResponseDto> CreateToken(CancellationToken cancellationToken, User user)
+    {
+        (TokenResponseDto tokenResponseDto, DateTime expirationDateTimeUtc) = await tokenService.CreateTokenResponse(user, cancellationToken);
+        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7); // Must be provided in other place ¿?
+        
+        user.RefreshToken = tokenResponseDto.RefreshToken;
+        user.RefreshTokenExpirationTimeUtc = refreshTokenExpirationDateTimeUtc;
+        
+        await UpdateUserAsync(user, cancellationToken);
+        
+        tokenService.WriteAuthTokenAsHttpOnlyCookie(TokenConstants.ACCESS_TOKEN, tokenResponseDto.AccessToken, expirationDateTimeUtc);
+        tokenService.WriteAuthTokenAsHttpOnlyCookie(TokenConstants.REFRESH_TOKEN, tokenResponseDto.RefreshToken, refreshTokenExpirationDateTimeUtc);
+        return tokenResponseDto;
+    }
+
+    public async Task<(TokenResponseDto, DateTime)> RefreshTokenAsync(RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken = default)
     {
         await userValidationService.ValidateTokenAndThrowAsync(refreshTokenRequestDto, cancellationToken);
         
-        return await tokenService.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
+        var token = refreshTokenRequestDto.MapToToken();
+        
+        return await tokenService.RefreshTokenAsync(token, cancellationToken);
     }
 
-    private async Task<User?> GetUser(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
+    private async Task<User?> GetUser(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
         return userLoginRequestDto.Email != null
                 ? await userRepository.GetUserByEmail(userLoginRequestDto.Email, cancellationToken)
                 : await userRepository.GetUserByUsername(userLoginRequestDto.Username!, cancellationToken);
+    }
+
+    private async Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)
+    {
+        await userRepository.UpdateUserAsync(user, cancellationToken);
     }
 }
