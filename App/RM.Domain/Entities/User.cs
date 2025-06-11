@@ -6,9 +6,9 @@ public class User
     public required string Email { get; init; }
     public required string Username { get; init; }
     public required string HashedPassword { get; init; }
+    public required string Role { get; init; }
     
     public bool TrustedUser { get; init; }
-    public string Role { get; init; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpirationTimeUtc { get; set; }
 }

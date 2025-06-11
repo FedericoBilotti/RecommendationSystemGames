@@ -13,6 +13,7 @@ public class UserValidator : AbstractValidator<User>
         _userRepository = userRepository;
         
         RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.Role).NotEmpty();
         
         RuleFor(x => x.Email)
                 .NotEmpty()
@@ -23,7 +24,9 @@ public class UserValidator : AbstractValidator<User>
         RuleFor(x => x.Username)
                 .NotEmpty()
                 .MinimumLength(3)
+                .WithMessage("Username must be at least 3 characters")
                 .MaximumLength(50)
+                .WithMessage("Username must be less than 50 characters")
                 .Matches("^[a-z0-9]+$")
                 .WithMessage("Username can only contain lowercase letters and numbers")
                 .Must(x => x == x.ToLower())

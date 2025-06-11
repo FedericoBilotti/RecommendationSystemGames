@@ -14,20 +14,21 @@ public static class UserMapping
             UserId = Guid.NewGuid(),
             Username = userLoginRequestDto.Username,
             Email = userLoginRequestDto.Email,
-            HashedPassword = hasher.HashPassword(userLoginRequestDto, userLoginRequestDto.Password)
+            HashedPassword = hasher.HashPassword(userLoginRequestDto, userLoginRequestDto.Password),
+            Role = "User"
         };
     }
 
-    public static User MapToUser(this UserLoginRequestDto userLogin, Guid userId)
-    {
-        return new User
-        {
-            UserId = userId,
-            Username = userLogin.Username!,
-            Email = userLogin.Email!,
-            HashedPassword = userLogin.Password
-        };
-    }
+    // public static User MapToUser(this UserLoginRequestDto userLogin, Guid userId)
+    // {
+    //     return new User
+    //     {
+    //         UserId = userId,
+    //         Username = userLogin.Username!,
+    //         Email = userLogin.Email!,
+    //         HashedPassword = userLogin.Password
+    //     };
+    // }
 
     public static UserResponseDto MapToUserResponse(this User user)
     {
