@@ -1,19 +1,17 @@
+using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using FluentValidation;
 using RM.Domain.Entities;
 
 namespace App.Services.Validators.Users;
 
-public class UserValidator : AbstractValidator<User>
+public class UserRegisterValidator : AbstractValidator<UserRegisterRequestDto>
 {
     private readonly IUserRepository _userRepository;
     
-    public UserValidator(IUserRepository userRepository)
+    public UserRegisterValidator(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        
-        RuleFor(x => x.UserId).NotEmpty();
-        RuleFor(x => x.Role).NotEmpty();
         
         RuleFor(x => x.Email)
                 .NotEmpty()
@@ -34,34 +32,24 @@ public class UserValidator : AbstractValidator<User>
                 .MustAsync(IsUsernameUnique)
                 .WithMessage("Username already exists");
         
-        RuleFor(x => x.HashedPassword)
+        RuleFor(x => x.Password)
                 .NotEmpty()
                 .MinimumLength(5)
                 .WithMessage("The password must be at least 5 characters")
                 .MaximumLength(100)
                 .WithMessage("The password must be less than 100 characters");
     }
-    
-    private async Task<bool> IsUsernameUnique(User user, string username, CancellationToken cancellationToken = default)
+
+    private async Task<bool> IsUsernameUnique(UserRegisterRequestDto userRegisterRequestDto, string username, CancellationToken cancellationToken = default)
     {
         User? existingUser = await _userRepository.GetUserByUsername(username, cancellationToken);
-
-        if (existingUser != null)
-        {
-            return existingUser.UserId == user.UserId;
-        }
 
         return existingUser == null;
     }
 
-    private async Task<bool> IsEmailUnique(User user, string email, CancellationToken cancellationToken = default)
+    private async Task<bool> IsEmailUnique(UserRegisterRequestDto userRegisterRequestDto, string email, CancellationToken cancellationToken = default)
     {
         User? existingUser = await _userRepository.GetUserByEmail(email, cancellationToken);
-
-        if (existingUser != null)
-        {
-            return existingUser.UserId == user.UserId;
-        }
 
         return existingUser == null;
     }

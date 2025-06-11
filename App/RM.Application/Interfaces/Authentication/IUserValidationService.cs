@@ -3,9 +3,9 @@ using RM.Domain.Entities;
 
 namespace App.Interfaces.Authentication;
 
-public interface IValidationService
+public interface IUserValidationService
 {
-    Task ValidateUserAndThrowAsync(User user, CancellationToken cancellationToken);        
+    Task ValidateUserAndThrowAsync(UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken);        
     Task ValidateLoginAndThrowAsync(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken);        
     Task ValidateTokenAndThrowAsync(RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken);        
 }

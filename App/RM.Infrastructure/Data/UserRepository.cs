@@ -12,7 +12,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
 
         int result = await connection.ExecuteAsync(new CommandDefinition("""
                                                                          INSERT INTO users (userid, email, username, hashedPassword, role)
-                                                                         VALUES (@userId, @username, @email, @hashedPassword, @role)
+                                                                         VALUES (@userId, @email, @username, @hashedPassword, @role)
                                                                          """, user, cancellationToken: cancellationToken));
         
         return result > 0;
@@ -39,7 +39,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
                                                                                            SELECT *
                                                                                            FROM users 
                                                                                            WHERE username = @username
-                                                                                           """, new { username }, cancellationToken: cancellationToken));
+                                                                                           """, new { username}, cancellationToken: cancellationToken));
         
         return result;
     }

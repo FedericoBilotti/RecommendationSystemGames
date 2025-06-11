@@ -5,11 +5,11 @@ using RM.Domain.Entities;
 
 namespace App.Services.Validators.Users;
 
-public class UserValidationService(IValidator<User> userValidator, IValidator<UserLoginRequestDto> userLoginValidator, IValidator<RefreshTokenRequestDto> refreshTokenValidator) : IValidationService
+public class UserValidationService(IValidator<UserRegisterRequestDto> userValidator, IValidator<UserLoginRequestDto> userLoginValidator, IValidator<RefreshTokenRequestDto> refreshTokenValidator) : IUserValidationService
 {
-    public Task ValidateUserAndThrowAsync(User user, CancellationToken cancellationToken)
+    public Task ValidateUserAndThrowAsync(UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken)
     {
-        return userValidator.ValidateAndThrowAsync(user, cancellationToken);
+        return userValidator.ValidateAndThrowAsync(userRegisterRequestDto, cancellationToken);
     }
 
     public Task ValidateLoginAndThrowAsync(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)

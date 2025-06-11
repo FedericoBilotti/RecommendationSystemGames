@@ -19,7 +19,7 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
         return new TokenResponseDto
         {
             AccessToken = GenerateToken(user),
-            RefreshToken = await GenerateAndSaveRefreshToken(user)
+            RefreshToken = await GenerateAndSaveRefreshToken(user, cancellationToken)
         };
     }
 
@@ -40,14 +40,15 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
         return isNotValid ? null : user;
     }
 
-    private async Task<string> GenerateAndSaveRefreshToken(User user)
+    private async Task<string> GenerateAndSaveRefreshToken(User user, CancellationToken cancellationToken = default)
     {
         string refreshToken = GenerateRefreshToken();
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpirationTimeUtc = DateTime.UtcNow.AddMinutes(30);
-        
+
         // await context.SaveChangesAsync();
-        
+        // userRepository.
+
         return refreshToken;
     }
 
@@ -68,9 +69,14 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
             new(ClaimTypes.Role, user.Role)
         };
 
+        // Change symmetric key?
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-        var tokenDescriptor = new JwtSecurityToken(issuer: configuration.GetValue<string>("AppSettings:Issuer"), audience: configuration.GetValue<string>("AppSettings:Audience"), claims: claims,
+        
+        var tokenDescriptor = new JwtSecurityToken(
+                issuer: configuration.GetValue<string>("AppSettings:Issuer"), 
+                audience: configuration.GetValue<string>("AppSettings:Audience"), 
+                claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(30), signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);

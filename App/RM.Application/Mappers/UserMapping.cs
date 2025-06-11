@@ -7,14 +7,14 @@ namespace App.Mappers;
 
 public static class UserMapping
 {
-    public static User MapToUser(this UserRegisterRequestDto userLoginRequestDto, IPasswordHasher<UserRegisterRequestDto> hasher)
+    public static User MapToUser(this UserRegisterRequestDto userLoginRequestDto, string password)
     {
         return new User
         {
             UserId = Guid.NewGuid(),
             Username = userLoginRequestDto.Username,
             Email = userLoginRequestDto.Email,
-            HashedPassword = hasher.HashPassword(userLoginRequestDto, userLoginRequestDto.Password),
+            HashedPassword = password,
             Role = "User"
         };
     }

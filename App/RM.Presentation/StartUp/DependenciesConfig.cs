@@ -39,7 +39,7 @@ public static class DependenciesConfig
         
         // Authentication 
         builder.Services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
-        builder.Services.AddScoped<IValidationService, UserValidationService>();
+        builder.Services.AddScoped<IUserValidationService, UserValidationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
         builder.Services.AddScoped<IAuthenticateUserUseCase, AuthenticateUserUseCase>();

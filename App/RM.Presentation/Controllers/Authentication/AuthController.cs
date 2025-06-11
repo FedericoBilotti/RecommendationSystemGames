@@ -21,6 +21,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
             return BadRequest("User already exists");
         }
 
+        // Must return the endpoint of the profile (if it exists) and the userId
         return Created($"{AuthEndpoints.Auth.REGISTER}/{userResponseDto.UserId}", userResponseDto);
     }
 
@@ -52,7 +53,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
 
     [Authorize]
     [HttpGet("Authenticate")]
-    public IActionResult AuthenticatedOnlyEndpoint()
+    public IActionResult AuthorizeOnlyEndpoint()
     {
         // Examples
         return Ok("You are authenticated");
