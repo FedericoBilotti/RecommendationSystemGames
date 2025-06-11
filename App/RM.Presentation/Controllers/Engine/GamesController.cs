@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using RM.Domain.Entities.Games;
 using RM.Presentation.Routes;
 using Microsoft.AspNetCore.Mvc;
-using RM.Presentation.Auth;
+using RM.Presentation.Auth; 
 
 namespace RM.Presentation.Controllers.Engine;
 

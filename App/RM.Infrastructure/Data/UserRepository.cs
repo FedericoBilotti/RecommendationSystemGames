@@ -38,7 +38,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
         var result = await connection.QueryFirstOrDefaultAsync<User>(new CommandDefinition("""
                                                                                            SELECT *
                                                                                            FROM users 
-                                                                                           WHERE userId = @userId
+                                                                                           WHERE username = @username
                                                                                            """, new { username }, cancellationToken: cancellationToken));
         
         return result;

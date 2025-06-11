@@ -17,8 +17,10 @@ public class AuthenticateUserUseCase(
     public async Task<UserResponseDto?> RegisterAsync(UserRegisterRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
         User user = userLoginRequestDto.MapToUser(hasher);
-
+        
+        Console.WriteLine("antes");
         await validationService.ValidateUserAndThrowAsync(user, cancellationToken);
+        Console.WriteLine("despues");
 
         bool result = await userRepository.CreateUserAsync(user, cancellationToken);
 
