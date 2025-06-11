@@ -8,4 +8,5 @@ public interface IUserRepository
     Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken = default);
     Task<User?> GetUserByUsername(string username, CancellationToken cancellationToken = default);
     Task<User?> GetUserByEmail(string email, CancellationToken cancellationToken);
+    Task<bool> UpdateUserAsync(User user, CancellationToken cancellationToken = default);
 }

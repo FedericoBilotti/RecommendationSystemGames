@@ -11,14 +11,14 @@ namespace App.UseCases.Authentication;
 public class AuthenticateUserUseCase(
         IUserRepository userRepository,
         ITokenService tokenService,
-        IPasswordHasher<UserRegisterRequestDto> hasher,
+        IHasherService hasherServiceService,
         IUserValidationService userValidationService) : IAuthenticateUserUseCase
 {
     public async Task<UserResponseDto?> RegisterAsync(UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken = default)
     {
         await userValidationService.ValidateUserAndThrowAsync(userRegisterRequestDto, cancellationToken);
 
-        string password = hasher.HashPassword(userRegisterRequestDto, userRegisterRequestDto.Password);
+        string password = hasherServiceService.RegisterHasher(userRegisterRequestDto);
         User user = userRegisterRequestDto.MapToUser(password);
 
         bool result = await userRepository.CreateUserAsync(user, cancellationToken);
@@ -35,21 +35,18 @@ public class AuthenticateUserUseCase(
         if (user == null)
             return null;
 
-        // Must be provided in the constructor
-        //
-        var s = new PasswordHasher<User>();
-        var passwordResult = s.VerifyHashedPassword(user, user.HashedPassword, userLoginRequestDto.Password);
-
+        var passwordResult = hasherServiceService.LoginHasher(user, userLoginRequestDto);
         if (passwordResult == PasswordVerificationResult.Failed)
         {
             return null;
         }
-        //
 
-        Console.WriteLine($"User after login: {user.Username}");
-        TokenResponseDto tokenResponseDto = await tokenService.CreateTokenResponse(user, cancellationToken);
-        Console.WriteLine($"Token response: {tokenResponseDto.AccessToken}");
-        Console.WriteLine($"Token response: {tokenResponseDto.RefreshToken}");
+        var tokenResponseDto = await tokenService.CreateTokenResponse(user, cancellationToken);
+        
+        user.RefreshToken = tokenResponseDto.RefreshToken;
+        user.RefreshTokenExpirationTimeUtc = DateTime.UtcNow.AddDays(7);
+        
+        // Add this to the db
 
         return tokenResponseDto;
     }

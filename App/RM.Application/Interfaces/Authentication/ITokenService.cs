@@ -9,4 +9,5 @@ public interface ITokenService
 {
     Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default);
     Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken = default);
+    void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration);
 }

@@ -6,20 +6,26 @@ using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces;
 using App.Interfaces.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 
 namespace App.Services.Authenticate;
 
-public class TokenService(IUserRepository userRepository, IConfiguration configuration) : ITokenService
+public class TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ITokenService
 {
     public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
+        (string? handler, DateTime expiresTime) generatedToken = GenerateToken(user);
+        
+        if (generatedToken.handler == null)
+            throw new Exception("Error generating token");
+        
         return new TokenResponseDto
         {
-            AccessToken = GenerateToken(user),
-            RefreshToken = await GenerateAndSaveRefreshToken(user, cancellationToken)
+            AccessToken = generatedToken.handler,
+            RefreshToken = await GenerateAndSaveRefreshToken(user, generatedToken.expiresTime, cancellationToken)
         };
     }
 
@@ -32,6 +38,18 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
         return await CreateTokenResponse(user, cancellationToken);
     }
 
+    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
+    {
+        httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, token, new CookieOptions
+        {
+            HttpOnly = true, 
+            Expires = expiration, 
+            IsEssential = true, 
+            Secure = true, 
+            SameSite = SameSiteMode.Strict
+        });
+    }
+
     private async Task<User?> ValidateRefreshToken(Guid userId, string refreshToken)
     {
         User? user = await userRepository.GetUserById(userId);
@@ -40,11 +58,11 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
         return isNotValid ? null : user;
     }
 
-    private async Task<string> GenerateAndSaveRefreshToken(User user, CancellationToken cancellationToken = default)
+    private async Task<string> GenerateAndSaveRefreshToken(User user, DateTime expiresTime, CancellationToken cancellationToken = default)
     {
         string refreshToken = GenerateRefreshToken();
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpirationTimeUtc = DateTime.UtcNow.AddMinutes(30);
+        user.RefreshTokenExpirationTimeUtc = expiresTime;
 
         // await context.SaveChangesAsync();
         // userRepository.
@@ -54,13 +72,13 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
 
     private string GenerateRefreshToken()
     {
-        var randomNumber = new byte[32];
+        var randomNumber = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
     }
 
-    private string GenerateToken(User user)
+    private (string?, DateTime) GenerateToken(User user)
     {
         var claims = new List<Claim>
         {
@@ -69,16 +87,22 @@ public class TokenService(IUserRepository userRepository, IConfiguration configu
             new(ClaimTypes.Role, user.Role)
         };
 
+        DateTime expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));
+
         // Change symmetric key?
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
+        
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
-        var tokenDescriptor = new JwtSecurityToken(
+        var token = new JwtSecurityToken(
                 issuer: configuration.GetValue<string>("AppSettings:Issuer"), 
                 audience: configuration.GetValue<string>("AppSettings:Audience"), 
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30), signingCredentials: credentials);
+                expires: expires,
+                signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        string? handler = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return (handler, expires);
     }
 }

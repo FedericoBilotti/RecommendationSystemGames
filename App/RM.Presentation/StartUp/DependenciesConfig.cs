@@ -4,6 +4,7 @@ using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using App.Interfaces.Authentication;
 using App.Interfaces.Engine;
+using App.Services;
 using App.Services.Authenticate;
 using App.Services.Validators.Users;
 using App.UseCases.Authentication;
@@ -12,6 +13,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
 using RM.Presentation.Auth;
@@ -29,16 +31,22 @@ public static class DependenciesConfig
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
         
-        // Game
-        builder.Services.AddScoped<IGameUseCase, GameUseCase>();
-        builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
+        // Repositories
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IGamesRepository, GamesRepository>();
         builder.Services.AddScoped<IRatingRepository, RatingRepository>();
         builder.Services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
         
-        // Authentication 
+        // Game
+        builder.Services.AddScoped<IGameUseCase, GameUseCase>();
+        builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
+        
+        // Hasher
         builder.Services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
+        builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        builder.Services.AddScoped<IHasherService, HasherService>();
+        
+        // Authentication 
         builder.Services.AddScoped<IUserValidationService, UserValidationService>();
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
@@ -72,6 +80,15 @@ public static class DependenciesConfig
                 ValidateLifetime = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
                 ValidateIssuerSigningKey = true
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    context.Token = context.Request.Cookies["access_token"];
+                    return Task.CompletedTask;
+                }
             };
         });
     }
