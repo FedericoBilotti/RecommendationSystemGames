@@ -48,11 +48,14 @@ public static class GameMapping
         return gameResponse;
     }
 
-    public static GamesResponseDto MapToResponse(this IEnumerable<Game> game)
+    public static GamesResponseDto MapToResponse(this IEnumerable<Game> game, int page, int pageSize, int totalCount)
     {
         return new GamesResponseDto
         {
-            GamesResponseDtos = game.Select(g => g.MapToResponse()).ToList()
+            GamesResponseDtos = game.Select(g => g.MapToResponse()).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
         };
     }
     
@@ -66,12 +69,17 @@ public static class GameMapping
         });
     }
 
-    public static GetAllGameOptions MapToOptions(this GetAllGameRequest getAllMoviesRequest)
+    public static GetAllGameOptions MapToOptions(this GetAllGameRequestDto requestDto)
     {
         return new GetAllGameOptions
         {
-            Title = getAllMoviesRequest.Title,
-            YearOfRelease = getAllMoviesRequest.YearOfRelease
+            Title = requestDto.Title,
+            YearOfRelease = requestDto.YearOfRelease,
+            SortField = requestDto.SortBy?.TrimStart('+', '-'),
+            SortOrder = requestDto.SortBy is null ? SortOrder.Unsorted : 
+                    requestDto.SortBy.StartsWith("+") ? SortOrder.Ascending : SortOrder.Descending,
+            Page = requestDto.Page,
+            PageSize = requestDto.PageSize
         };
     }
 

@@ -46,14 +46,11 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
-    public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequest getAllGameRequest, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequestDto getAllGameRequestDto, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        IEnumerable<Game> game = await gameUseCase.GetAllAsync(getAllGameRequest, userId, cancellationToken);
-
-        GamesResponseDto gameResponse = game.MapToResponse();
-
-        return Ok(gameResponse);
+        GamesResponseDto gamesResponseDto = await gameUseCase.GetAllAsync(getAllGameRequestDto, userId, cancellationToken);
+        return Ok(gamesResponseDto);
     }
 
     [Authorize(AuthConstants.TRUSTED_ROLE)]

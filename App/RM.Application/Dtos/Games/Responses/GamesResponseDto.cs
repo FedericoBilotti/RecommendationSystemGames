@@ -1,6 +1,5 @@
 namespace App.Dtos.Games.Responses;
 
-public class GamesResponseDto
+public class GamesResponseDto : PagedResponse<GameResponseDto>
 {
-    public required IEnumerable<GameResponseDto> GamesResponseDtos { get; init; } = Enumerable.Empty<GameResponseDto>();
 }

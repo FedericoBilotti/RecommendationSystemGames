@@ -93,23 +93,38 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
-        var games = await connection.QueryAsync(new CommandDefinition("""
-                                                                      SELECT g.*, 
-                                                                             string_agg(DISTINCT gen.name, ', ') as genres, 
-                                                                             ROUND(AVG(r.rating), 1) as rating, 
-                                                                             myr.rating as UserRating
-                                                                      FROM games g
-                                                                      LEFT JOIN genres gen ON g.gameId = gen.gameId
-                                                                      LEFT JOIN ratings r ON g.gameId = r.gameId
-                                                                      LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId
-                                                                      WHERE (@title IS NULL OR g.title LIKE ('%' || @title || '%'))
-                                                                      AND (@yearOfRelease IS NULL OR g.yearOfRelease = @yearOfRelease)
-                                                                      GROUP BY g.gameId, myr.rating
-                                                                      """, new
+        var orderClause = string.Empty;
+
+        if (gameOptions.SortField != null)
+        {
+            orderClause = $"""
+                           , g.{gameOptions.SortField}
+                           ORDER BY g.{gameOptions.SortField} {(gameOptions.SortOrder == SortOrder.Ascending ? "ASC" : "DESC")}
+                           """;
+        }
+
+        var games = await connection.QueryAsync(new CommandDefinition($"""
+                                                                       SELECT g.*, 
+                                                                              string_agg(DISTINCT gen.name, ', ') as genres, 
+                                                                              ROUND(AVG(r.rating), 1) as rating, 
+                                                                              myr.rating as UserRating
+                                                                       FROM games g
+                                                                       LEFT JOIN genres gen ON g.gameId = gen.gameId
+                                                                       LEFT JOIN ratings r ON g.gameId = r.gameId
+                                                                       LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId
+                                                                       WHERE (@title IS NULL OR g.title LIKE ('%' || @title || '%'))
+                                                                       AND (@yearOfRelease IS NULL OR g.yearOfRelease = @yearOfRelease)
+                                                                       GROUP BY g.gameId, myr.rating {orderClause}
+                                                                       LIMIT @pageSize
+                                                                       OFFSET @pageOffset
+
+                                                                       """, new
         {
             userId = gameOptions.UserId,
             title = gameOptions.Title,
-            yearOfRelease = gameOptions.YearOfRelease
+            yearOfRelease = gameOptions.YearOfRelease,
+            pageSize = gameOptions.PageSize,
+            pageOffset = (gameOptions.Page - 1) * gameOptions.PageSize
         }, cancellationToken: cancellationToken));
 
 
@@ -183,5 +198,16 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                                                                                SELECT COUNT(1) FROM games
                                                                                WHERE gameId = @gameId
                                                                                """, new { gameId }, cancellationToken: cancellationToken));
+    }
+
+    public async Task<int> GetCountAsync(string? title = default, int? yearOfRelease = default, CancellationToken cancellationToken = default)
+    {
+        using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
+
+        return await connection.QuerySingleAsync<int>(new CommandDefinition("""
+                                                                            SELECT COUNT(gameid) FROM games
+                                                                            WHERE (@title IS NULL OR title LIKE ('%' || @title || '%'))
+                                                                            AND (@yearOfRelease IS NULL OR yearOfRelease = @yearOfRelease)
+                                                                            """, new { title, yearOfRelease }, cancellationToken: cancellationToken));
     }
 }

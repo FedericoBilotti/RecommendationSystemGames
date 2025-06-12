@@ -13,14 +13,17 @@ public class GameUseCase : IGameUseCase
     private readonly IGamesRepository _gamesRepository;
     private readonly IRatingRepository _ratingRepository;
     private readonly IValidator<Game> _gameValidatorService;
-    private readonly IValidator<GetAllGameRequest> _getAllGameValidatorService;
+    private readonly IValidator<GetAllGameRequestDto> _getAllGameValidatorService;
+    private readonly IValidator<GetAllGameOptions> _getAllGameValidatorServiceDto;
 
-    public GameUseCase(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidatorService, IValidator<GetAllGameRequest> getAllGameValidatorService)
+    public GameUseCase(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidatorService, IValidator<GetAllGameRequestDto> getAllGameValidatorService, 
+            IValidator<GetAllGameOptions> getAllGameValidatorServiceDto)
     {
         _gamesRepository = gamesRepository;
         _ratingRepository = ratingRepository;
         _gameValidatorService = gameValidatorService;
         _getAllGameValidatorService = getAllGameValidatorService;
+        _getAllGameValidatorServiceDto = getAllGameValidatorServiceDto;
     }
 
     public async Task<GameResponseDto?> CreateAsync(CreateGameRequestDto createGameRequestDto, CancellationToken cancellationToken = default)
@@ -75,13 +78,25 @@ public class GameUseCase : IGameUseCase
         return _gamesRepository.DeleteByIdAsync(gameId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync(GetAllGameRequest getAllGameRequest, Guid? userId = default, CancellationToken cancellationToken = default)
+    public async Task<GamesResponseDto> GetAllAsync(GetAllGameRequestDto getAllGameRequestDto, Guid? userId = default, CancellationToken cancellationToken = default)
     {
-        // validate
-        await _getAllGameValidatorService.ValidateAndThrowAsync(getAllGameRequest, cancellationToken);
-
-        GetAllGameOptions gameOptions = getAllGameRequest.MapToOptions().WithId(userId ?? Guid.Empty);
+        await _getAllGameValidatorService.ValidateAndThrowAsync(getAllGameRequestDto, cancellationToken);
         
-        return await _gamesRepository.GetAllAsync(gameOptions, cancellationToken);
+        GetAllGameOptions gameOptions = getAllGameRequestDto.MapToOptions().WithId(userId ?? Guid.Empty);
+        
+        await _getAllGameValidatorServiceDto.ValidateAndThrowAsync(gameOptions, cancellationToken);
+        
+        IEnumerable<Game> games = await _gamesRepository.GetAllAsync(gameOptions, cancellationToken);
+        
+        int count = await GetCountAsync(getAllGameRequestDto.Title, getAllGameRequestDto.YearOfRelease, cancellationToken);
+
+        GamesResponseDto gameResponse = games.MapToResponse(getAllGameRequestDto.Page, getAllGameRequestDto.PageSize, count);
+        
+        return gameResponse;
+    }
+
+    public Task<int> GetCountAsync(string? title = default, int? yearOfRelease = default, CancellationToken cancellationToken = default)
+    {
+        return _gamesRepository.GetCountAsync(title, yearOfRelease, cancellationToken);
     }
 }
