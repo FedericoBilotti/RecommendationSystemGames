@@ -5,15 +5,24 @@ using RM.Domain.Entities;
 
 namespace App.Services;
 
-public class HasherService(IPasswordHasher<UserRegisterRequestDto> hasher, IPasswordHasher<User> hasherLogin) : IHasherService
+public class HasherService : IHasherService
 {
+    private readonly IPasswordHasher<UserRegisterRequestDto> _hasherRegister;
+    private readonly IPasswordHasher<User> _hasherLogin;
+
+    public HasherService(IPasswordHasher<UserRegisterRequestDto> hasherRegister, IPasswordHasher<User> hasherLogin)
+    {
+        _hasherRegister = hasherRegister;
+        _hasherLogin = hasherLogin;
+    }
+    
     public string RegisterHasher(UserRegisterRequestDto dto)
     {
-        return hasher.HashPassword(dto, dto.Password);
+        return _hasherRegister.HashPassword(dto, dto.Password);
     }
     
     public PasswordVerificationResult LoginHasher(User user, UserLoginRequestDto dto)
     {
-        return hasherLogin.VerifyHashedPassword(user, user.HashedPassword, dto.Password);
+        return _hasherLogin.VerifyHashedPassword(user, user.HashedPassword, dto.Password);
     }
 }
