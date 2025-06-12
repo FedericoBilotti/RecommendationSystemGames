@@ -25,9 +25,10 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
             return BadRequest("Game already exists");
         }
         
-        return CreatedAtAction(nameof(Get), new { idOrSlug = gameResponseDto.GameId }, gameResponseDto);
+        return CreatedAtAction(nameof(Get), new { idOrSlug = gameResponseDto.GameId }, gameResponseDto); 
     }
 
+    [Authorize]
     [HttpGet(ApiEndpoints.V1.Games.GET)]
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
@@ -45,6 +46,7 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
         return Ok(gameResponse);
     }
 
+    [Authorize]
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
     public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequestDto getAllGameRequestDto, CancellationToken cancellationToken = default)
     {
