@@ -7,7 +7,6 @@ namespace App.Services.Validators.Users;
 
 public class RefreshTokenValidator : AbstractValidator<RefreshTokenRequestDto>
 {
-
     public RefreshTokenValidator()
     {
         RuleFor(x => x.UserId).NotEmpty();

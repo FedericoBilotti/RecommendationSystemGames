@@ -60,13 +60,20 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
     public async Task<bool> UpdateUserAsync(User user, CancellationToken cancellationToken = default)
     {
         using var connection = await context.GetConnectionAsync(cancellationToken);
-        
+
         // It's better option tu use the id or the username/email, cause is indexed ¿?
         // I think the problem with username and email is that they can change, but the id can not
         int result = await connection.ExecuteAsync(new CommandDefinition("""
                                                                          UPDATE users
-                                                                         SET email = @email, username = @username, hashedPassword = @hashedPassword, role = @role
-                                                                         WHERE userId = @userId
+                                                                         SET 
+                                                                             email = @email, 
+                                                                             username = @username, 
+                                                                             hashedPassword = @hashedPassword, 
+                                                                             role = @role, 
+                                                                             refreshToken = @refreshToken, 
+                                                                             refreshTokenExpirationTimeUtc = @refreshTokenExpirationTimeUtc, trustedUser = @trustedUser
+                                                                         WHERE 
+                                                                             userId = @userId
                                                                          """, user, cancellationToken: cancellationToken));
 
         return result > 0;

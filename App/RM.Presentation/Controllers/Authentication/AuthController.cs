@@ -45,11 +45,15 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     {
         string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
         Guid? id = HttpContext.GetUserId();
+
+        Console.WriteLine($"\nUser id: {id}");
         
         var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
         var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
         
-        if (tokenResponseDto.AccessToken == null || tokenResponseDto.RefreshToken == null)
+        Console.WriteLine($"Token response: {tokenResponseDto}");
+        
+        if (tokenResponseDto == null)
         {
             return Unauthorized("Refresh token is invalid");
         }

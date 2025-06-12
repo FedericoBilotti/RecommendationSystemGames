@@ -6,17 +6,33 @@ services:
       context: "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App"
       dockerfile: "RM.Presentation/Dockerfile"
       target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
     command: []
     entrypoint:
-    - "dotnet"
-    - "/app/bin/Debug/net9.0/RM.Presentation.dll"
+    - "/opt/rider-debugger/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/rider-debugger/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57100"
+    - "--backend-port=57300"
+    - "--timeout=60"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/rider-debugger"
+      RESHARPER_LOG_CONF: "/etc/opt/rider-debugger/backend-log.xml"
     image: "rm.presentation:dev"
-    ports: []
+    ports:
+    - "127.0.0.1:57005:57100"
+    - "127.0.0.1:57205:57300"
     volumes:
     - "C:\\Users\\fedeb\\.nuget\\packages:/root/.nuget/packages"
     - "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App\\RM.Presentation:/app:rw"
     - "C:\\Users\\fedeb\\OneDrive\\Desktop\\RecommendationSystemGames\\App:/src:rw"
+    - "C:\\Users\\fedeb\\AppData\\Local\\JetBrains\\RiderRemoteDebugger\\2024.2.8\\\
+      Linux64:/opt/rider-debugger"
+    - "C:\\Program Files\\JetBrains\\JetBrains Rider 2023.1.2\\bin:/etc/opt/rider-debugger/backend-log.xml"
+    - "C:\\Users\\fedeb\\AppData\\Local\\JetBrains\\Rider2024.2\\log\\DebuggerWorker\\\
+      JetBrains.Debugger.Worker.2025_6_12_12_37_22:/var/opt/rider-debugger:rw"
     working_dir: "/app"

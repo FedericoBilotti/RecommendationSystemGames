@@ -20,15 +20,6 @@ public static class UserMapping
         };
     }
     
-    public static Token MapToToken(this RefreshTokenRequestDto refreshTokenRequestDto)
-    {
-        return new Token
-        {
-            UserId = (Guid)refreshTokenRequestDto.UserId!,
-            RefreshToken = refreshTokenRequestDto.RefreshToken!
-        };
-    }
-
     public static UserResponseDto MapToUserResponse(this User user)
     {
         return new UserResponseDto

@@ -51,9 +51,7 @@ public class AuthenticateUserUseCase(
     {
         await userValidationService.ValidateTokenAndThrowAsync(refreshTokenRequestDto, cancellationToken);
         
-        Token token = refreshTokenRequestDto.MapToToken();
-        
-        return await tokenService.RefreshTokenAsync(token, cancellationToken);
+        return await tokenService.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
     }
 
     private async Task<User?> GetUser(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)

@@ -13,8 +13,19 @@ using RM.Domain.Entities;
 
 namespace App.Services.Authenticate;
 
-public class TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration) : ITokenService
+public class TokenService : ITokenService
 {
+    private readonly IUserRepository _userRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
+
+    public TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    {
+        _userRepository = userRepository;
+        _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
+    }
+    
     public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
     {
         (string? handler, DateTime expiresTime) generatedToken = GenerateToken(user);
@@ -29,7 +40,7 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         };
     }
 
-    public async Task<TokenResponseDto?> RefreshTokenAsync(Token requestRefreshTokenDto, CancellationToken cancellationToken = default)
+    public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto requestRefreshTokenDto, CancellationToken cancellationToken = default)
     {
         User? user = await ValidateRefreshToken(requestRefreshTokenDto.UserId, requestRefreshTokenDto.RefreshToken);
         
@@ -39,9 +50,9 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         return await CreateTokenResponse(user, cancellationToken);
     }
 
-    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
+    private void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
     {
-        httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, token, new CookieOptions
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, token, new CookieOptions
         {
             HttpOnly = true, 
             Expires = expiration, 
@@ -51,9 +62,11 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         });
     }
 
-    private async Task<User?> ValidateRefreshToken(Guid userId, string refreshToken)
+    private async Task<User?> ValidateRefreshToken(Guid? userId, string? refreshToken)
     {
-        User? user = await userRepository.GetUserById(userId);
+        if (userId == null) return null;
+        
+        User? user = await _userRepository.GetUserById((Guid)userId);
         bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTimeUtc < DateTime.UtcNow;
         return isNotValid ? null : user;
     }
@@ -88,18 +101,19 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
         {
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new(ClaimTypes.Role, user.Role)
+            new(ClaimTypes.Role, user.Role),
+            new("userid", user.UserId.ToString())
         };
 
-        DateTime expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));
+        DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));
 
         // Change symmetric key?
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
         var token = new JwtSecurityToken(
-                issuer: configuration.GetValue<string>("AppSettings:Issuer"), 
-                audience: configuration.GetValue<string>("AppSettings:Audience"), 
+                issuer: _configuration.GetValue<string>("AppSettings:Issuer"), 
+                audience: _configuration.GetValue<string>("AppSettings:Audience"), 
                 claims: claims,
                 expires: expires,
                 signingCredentials: credentials);
@@ -111,6 +125,6 @@ public class TokenService(IUserRepository userRepository, IHttpContextAccessor h
 
     private async Task UpdateUserAsync(User user, CancellationToken cancellationToken = default)
     {
-        await userRepository.UpdateUserAsync(user, cancellationToken);
+        await _userRepository.UpdateUserAsync(user, cancellationToken);
     }
 }
