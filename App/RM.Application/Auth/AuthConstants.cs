@@ -1,4 +1,4 @@
-namespace RM.Presentation.Auth;
+namespace App.Auth;
 
 public static class AuthConstants
 {

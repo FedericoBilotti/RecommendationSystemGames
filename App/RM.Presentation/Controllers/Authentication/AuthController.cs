@@ -1,12 +1,13 @@
 using App;
+using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RM.Domain.Entities;
-using RM.Presentation.Auth;
 using RM.Presentation.Routes;
+using RM.Presentation.Utility;
 
 namespace RM.Presentation.Controllers.Authentication;
 
@@ -68,8 +69,16 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         // Examples
         return Ok("You are authenticated");
     }
+    
+    [Authorize(AuthConstants.TRUSTED_ROLE)]
+    [HttpGet("trusted_user")]
+    public IActionResult TrustedOnlyEndpoint()
+    {
+        // Examples
+        return Ok("You are a trusted user");
+    }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(AuthConstants.ADMIN_ROLE)]
     [HttpGet("admin-only")]
     public IActionResult AuthenticatedAdmin()
     {

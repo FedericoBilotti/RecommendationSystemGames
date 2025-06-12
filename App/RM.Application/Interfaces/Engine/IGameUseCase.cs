@@ -11,5 +11,5 @@ public interface IGameUseCase
     Task<Game?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cancellationToken = default);
     Task<GameResponseDto?> UpdateAsync(UpdateGameRequestDto game, Guid gameId, Guid? userId = default, CancellationToken cancellationToken = default);
     Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Game>> GetAllAsync(Guid? userId = default, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Game>> GetAllAsync(GetAllGameRequest getAllGameRequest, Guid? userId = default, CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,4 @@
-namespace App;
+namespace App.Auth;
 
 public static class TokenConstants
 {

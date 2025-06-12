@@ -1,5 +1,6 @@
 using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
+using RM.Domain.Entities;
 using RM.Domain.Entities.Games;
 
 namespace App.Mappers;
@@ -63,5 +64,20 @@ public static class GameMapping
             Slug = x.Slug,
             Rating = x.Rating
         });
+    }
+
+    public static GetAllGameOptions MapToOptions(this GetAllGameRequest getAllMoviesRequest)
+    {
+        return new GetAllGameOptions
+        {
+            Title = getAllMoviesRequest.Title,
+            YearOfRelease = getAllMoviesRequest.YearOfRelease
+        };
+    }
+
+    public static GetAllGameOptions WithId(this GetAllGameOptions gameOptions, Guid gameId)
+    {
+        gameOptions.UserId = gameId;
+        return gameOptions;
     }
 }

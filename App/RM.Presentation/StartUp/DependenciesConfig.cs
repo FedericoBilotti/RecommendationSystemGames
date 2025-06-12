@@ -1,5 +1,6 @@
 using System.Text;
 using App;
+using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using App.Interfaces.Authentication;
@@ -17,7 +18,6 @@ using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
-using RM.Presentation.Auth;
 using RM.Presentation.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -64,10 +64,12 @@ public static class DependenciesConfig
     {
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy(AuthConstants.ADMIN_ROLE, policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
+            options.AddPolicy(AuthConstants.ADMIN_ROLE, 
+                    policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
             options.AddPolicy(AuthConstants.TRUSTED_ROLE,
                     policy => policy.RequireAssertion(x =>
-                            x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) || x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
+                            x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) || 
+                            x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
         });
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

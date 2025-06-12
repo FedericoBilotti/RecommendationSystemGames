@@ -2,6 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
 using App.Interfaces;
@@ -102,7 +104,9 @@ public class TokenService : ITokenService
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new(ClaimTypes.Role, user.Role),
-            new("userid", user.UserId.ToString())
+            new("userid", user.UserId.ToString()),
+            new(AuthConstants.ADMIN_CLAIM, user.Role == AuthConstants.ADMIN_ROLE ? "true" : "false", ClaimValueTypes.String),
+            new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
         };
 
         DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));

@@ -1,3 +1,4 @@
+using RM.Domain.Entities;
 using RM.Domain.Entities.Games;
 
 namespace App.Interfaces.Engine;
@@ -9,6 +10,6 @@ public interface IGamesRepository
     Task<Game?> GetBySlugAsync(string slug, Guid? userId = default, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(Game game, CancellationToken cancellationToken = default);
     Task<bool> DeleteByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Game>> GetAllAsync(Guid? userId = default, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Game>> GetAllAsync(GetAllGameOptions gameOptions, CancellationToken cancellationToken = default);
     Task<bool> ExistsByIdAsync(Guid gameId, CancellationToken cancellationToken = default);
 }

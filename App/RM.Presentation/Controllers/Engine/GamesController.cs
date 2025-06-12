@@ -1,3 +1,4 @@
+using App.Auth;
 using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using RM.Domain.Entities.Games;
 using RM.Presentation.Routes;
 using Microsoft.AspNetCore.Mvc;
-using RM.Presentation.Auth; 
+using RM.Presentation.Utility;
 
 namespace RM.Presentation.Controllers.Engine;
 
@@ -45,10 +46,10 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
-    public async Task<ActionResult<GamesResponseDto>> GetAll(CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequest getAllGameRequest, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
-        IEnumerable<Game> game = await gameUseCase.GetAllAsync(userId, cancellationToken);
+        IEnumerable<Game> game = await gameUseCase.GetAllAsync(getAllGameRequest, userId, cancellationToken);
 
         GamesResponseDto gameResponse = game.MapToResponse();
 
@@ -57,12 +58,12 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 
     [Authorize(AuthConstants.TRUSTED_ROLE)]
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
-    public async Task<ActionResult<GameResponseDto>> Update([FromBody] UpdateGameRequestDto updateGameRequest, [FromRoute] Guid gameId, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<GameResponseDto>> Update([FromBody] UpdateGameRequestDto updateGameRequest, [FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         // Maybe there is a problem if i dont map before
         // Game game = updateGameRequest.MapToGame(id);
         Guid? userId = HttpContext.GetUserId();
-        GameResponseDto? gameResponseDto = await gameUseCase.UpdateAsync(updateGameRequest, gameId, userId, cancellationToken);
+        GameResponseDto? gameResponseDto = await gameUseCase.UpdateAsync(updateGameRequest, id, userId, cancellationToken);
 
         if (gameResponseDto == null)
         {

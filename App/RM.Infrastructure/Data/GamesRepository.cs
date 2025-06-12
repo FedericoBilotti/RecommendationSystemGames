@@ -1,6 +1,7 @@
 using App.Interfaces;
 using App.Interfaces.Engine;
 using Dapper;
+using RM.Domain.Entities;
 using RM.Domain.Entities.Games;
 
 namespace RM.Infrastructure.Data;
@@ -42,7 +43,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                                                                                          LEFT JOIN ratings r on g.gameId = r.gameId
                                                                                          LEFT JOIN ratings myr on g.gameId = myr.gameId AND myr.userId = @userId
                                                                                          WHERE g.gameId = @gameId
-                                                                                         GROUP BY g.gameId, UserRating
+                                                                                         GROUP BY g.gameId, myr.rating
                                                                                          """, new { gameId, userId }, cancellationToken: cancellationToken));
 
         if (game == null) return null;
@@ -69,8 +70,8 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                                                                                          FROM games g
                                                                                          LEFT JOIN ratings r on g.gameId = r.gameId
                                                                                          LEFT JOIN ratings myr on g.gameId = myr.gameId AND myr.userId = @userId
-                                                                                         WHERE g.gameId = @gameId
-                                                                                         GROUP BY g.gameId, UserRating
+                                                                                         WHERE g.slug = @slug
+                                                                                         GROUP BY g.gameId, myr.rating
                                                                                          """, new { slug, userId }, cancellationToken: cancellationToken));
 
         if (game == null) return null;
@@ -88,7 +89,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         return game;
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync(Guid? userId = default, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Game>> GetAllAsync(GetAllGameOptions gameOptions, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 
@@ -101,8 +102,16 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
                                                                       LEFT JOIN genres gen ON g.gameId = gen.gameId
                                                                       LEFT JOIN ratings r ON g.gameId = r.gameId
                                                                       LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId
+                                                                      WHERE (@title IS NULL OR g.title LIKE ('%' || @title || '%'))
+                                                                      AND (@yearOfRelease IS NULL OR g.yearOfRelease = @yearOfRelease)
                                                                       GROUP BY g.gameId, myr.rating
-                                                                      """, new { userId }, cancellationToken: cancellationToken));
+                                                                      """, new
+        {
+            userId = gameOptions.UserId,
+            title = gameOptions.Title,
+            yearOfRelease = gameOptions.YearOfRelease
+        }, cancellationToken: cancellationToken));
+
 
         return games.Select(g => new Game
         {

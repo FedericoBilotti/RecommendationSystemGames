@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace RM.Presentation.Auth;
+namespace RM.Presentation.Utility;
 
 public static class IdentityExtensions
 {
