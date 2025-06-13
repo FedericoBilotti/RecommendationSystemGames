@@ -63,7 +63,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [Authorize]
-    [HttpGet("Authenticate")]
+    [HttpGet(AuthEndpoints.AUTHORIZED)]
     public IActionResult AuthorizeOnlyEndpoint()
     {
         // Examples
@@ -71,7 +71,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
     
     [Authorize(AuthConstants.TRUSTED_ROLE)]
-    [HttpGet("trusted_user")]
+    [HttpGet(AuthEndpoints.TRUSTED_USER)]
     public IActionResult TrustedOnlyEndpoint()
     {
         // Examples
@@ -79,7 +79,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [Authorize(AuthConstants.ADMIN_ROLE)]
-    [HttpGet("admin-only")]
+    [HttpGet(AuthEndpoints.ADMIN)]
     public IActionResult AuthenticatedAdmin()
     {
         // Examples

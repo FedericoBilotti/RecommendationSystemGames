@@ -4,6 +4,10 @@ public static class AuthEndpoints
 {
     private const string AUTH_BASE = "auth";
     
+    public const string AUTHORIZED = $"{AUTH_BASE}/authorized";
+    public const string ADMIN = $"{AUTH_BASE}/admin-only";
+    public const string TRUSTED_USER = $"{AUTH_BASE}/trusted_user";
+    
     public static class Auth 
     {
         public const string REGISTER = $"{AUTH_BASE}/register";
