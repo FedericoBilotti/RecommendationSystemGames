@@ -47,7 +47,7 @@ public static class DependenciesConfig
         builder.Services.AddScoped<IGameUseCase, GameUseCase>();
         builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
 
-        // Hasher
+        // Hasher                                                                
         builder.Services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         builder.Services.AddScoped<IHasherService, HasherService>();

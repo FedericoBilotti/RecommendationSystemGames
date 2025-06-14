@@ -5,20 +5,30 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using App;
 using App.Auth;
+using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using App.Interfaces.Authentication;
+using App.Interfaces.Engine;
+using App.Services;
 using App.Services.Authenticate;
+using App.Services.Validators.Users;
+using App.UseCases.Authentication;
+using App.UseCases.Engine;
 using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
 using RM.Presentation;
@@ -31,9 +41,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     private readonly PostgreSqlContainer _pgContainer;
     private DbInitializer _initializer;
 
-    public string TestConnectionString => _pgContainer.GetConnectionString();
-    
-    public IConfiguration Configuration { get; private set; }
+    private string TestConnectionString => _pgContainer.GetConnectionString();
+    private IConfiguration Configuration { get; set; }
     
     public ApiFactory()
     {
@@ -71,47 +80,34 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         builder.ConfigureServices(services =>
         {
+            services.AddHttpContextAccessor();                                              
+            services.AddSingleton(Configuration);
+            
+            // Database
             services.RemoveAll<IDbConnectionFactory>();
             services.AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(TestConnectionString));
-
-            services.AddHttpContextAccessor();
             
-            services.AddSingleton(Configuration);
+            // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IGamesRepository, GamesRepository>();
+            services.AddScoped<IRatingRepository, RatingRepository>();
+            services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
             
-            // services.AddAuthorization(options =>
-            // {
-            //     options.AddPolicy(AuthConstants.ADMIN_ROLE, 
-            //             policy => policy.RequireClaim(AuthConstants.ADMIN_CLAIM, "true"));
-            //     options.AddPolicy(AuthConstants.TRUSTED_ROLE,
-            //             policy => policy.RequireAssertion(x =>
-            //                     x.User.HasClaim(m => m is { Type: AuthConstants.ADMIN_CLAIM, Value: "true" }) || 
-            //                     x.User.HasClaim(m => m is { Type: AuthConstants.TRUSTED_CLAIM, Value: "true" })));
-            // });
-            //
-            // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            // {
-            //     options.TokenValidationParameters = new TokenValidationParameters
-            //     {
-            //         ValidateIssuer = true,
-            //         ValidIssuer = Configuration["AppSettings:Issuer"],
-            //         ValidateAudience = true,
-            //         ValidAudience = Configuration["AppSettings:Audience"],
-            //         ValidateLifetime = true,
-            //         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSettings:Token"]!)),
-            //         ValidateIssuerSigningKey = true
-            //     };
-            //
-            //     options.Events = new JwtBearerEvents
-            //     {
-            //         OnMessageReceived = context =>
-            //         {
-            //             context.Token = context.Request.Cookies[TokenConstants.ACCESS_TOKEN];
-            //             return Task.CompletedTask;
-            //         }
-            //     };
-            // });
+            // Game                                                          
+            services.AddScoped<IGameUseCase, GameUseCase>();         
+            services.AddScoped<IRatingUseCase, RatingUseCase>();
+            
+            // Hasher                                                                                                          
+            services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();     
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();                                         
+            services.AddScoped<IHasherService, HasherService>();
+            
+            // Authentication                 
+            services.AddHttpContextAccessor();                                      
+            services.AddScoped<IUserValidationService, UserValidationService>();    
+            services.AddScoped<ITokenService, TokenService>();                      
+            services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();               
+            services.AddScoped<IAuthenticateUserUseCase, AuthenticateUserUseCase>();
         });
     }
 }

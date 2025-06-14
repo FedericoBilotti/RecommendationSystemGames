@@ -1,4 +1,3 @@
-using App;
 using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
@@ -24,6 +23,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
             return BadRequest("User already exists");
         }
 
+        return Ok(userResponseDto);
         // Must return the endpoint of the profile (if it exists) and the userId
         return Created($"{AuthEndpoints.Auth.REGISTER}/{userResponseDto.UserId}", userResponseDto);
     }
@@ -41,18 +41,14 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return Ok(tokenResult);
     }
 
-    [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
+    [HttpGet(AuthEndpoints.Auth.REFRESH_TOKEN)]
     public async Task<ActionResult<TokenResponseDto>> RefreshToken(CancellationToken cancellationToken)
     {
         string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
         Guid? id = HttpContext.GetUserId();
-
-        Console.WriteLine($"\nUser id: {id}");
         
         var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
         var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
-        
-        Console.WriteLine($"Token response: {tokenResponseDto}");
         
         if (tokenResponseDto == null)
         {

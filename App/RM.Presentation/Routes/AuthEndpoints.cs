@@ -8,7 +8,7 @@ public static class AuthEndpoints
     public const string ADMIN = $"{AUTH_BASE}/admin-only";
     public const string TRUSTED_USER = $"{AUTH_BASE}/trusted_user";
     
-    public static class Auth 
+    public static class Auth
     {
         public const string REGISTER = $"{AUTH_BASE}/register";
         public const string LOGIN = $"{AUTH_BASE}/login";

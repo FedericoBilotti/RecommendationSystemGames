@@ -2,33 +2,28 @@ using App.Mappers;
 using RM.Infrastructure.Database;
 using RM.Presentation.StartUp;
 
-namespace RM.Presentation;
 
-public class Program
-{
-    public static async Task Main(string[] args)
-    {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+builder.Services.AddControllers();
 
-        builder.AddDependencies();
-        builder.AddJwtDependencies();
+builder.AddDependencies();
+builder.AddJwtDependencies();
 
-        WebApplication app = builder.Build();
+WebApplication app = builder.Build();
 
-        app.UseOpenApi();
+app.UseOpenApi();
 
-        // app.UseHttpsRedirection();
-        app.UseAuthentication();
-        app.UseAuthorization();
+// app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-        app.UseMiddleware<ValidationMappingMiddleware>();
-        app.MapControllers();
+app.UseMiddleware<ValidationMappingMiddleware>();
+app.MapControllers();
 
-        var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
-        await dbInitializer.InitializeDbAsync();
+var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+await dbInitializer.InitializeDbAsync();
 
-        app.Run();
-    }
-}
+app.Run();
+
+public partial class Program { }

@@ -69,14 +69,14 @@ public class TokenService : ITokenService
         if (userId == null) return null;
         
         User? user = await _userRepository.GetUserById((Guid)userId);
-        bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTimeUtc < DateTime.UtcNow;
-        return isNotValid ? null : user;
+        bool isValid = user != null && user.RefreshToken == refreshToken && user.RefreshTokenExpirationTimeUtc >= DateTime.UtcNow;
+        return isValid ? user : null;
     }
 
     private async Task<string> GenerateAndSaveRefreshToken(User user, string accessToken, DateTime expirationDateTimeUtc, CancellationToken cancellationToken = default)
     {
         string refreshToken = GenerateRefreshToken();
-        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7); // Must be provided in other place ¿?
+        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7);
         
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpirationTimeUtc = refreshTokenExpirationDateTimeUtc;
@@ -101,6 +101,7 @@ public class TokenService : ITokenService
     {
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new(ClaimTypes.Role, user.Role),
@@ -109,7 +110,7 @@ public class TokenService : ITokenService
             new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
         };
 
-        DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));
+        DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes")); // Must be provided in other place, instead of the IConfiguration directly.
 
         // Change symmetric key?
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
