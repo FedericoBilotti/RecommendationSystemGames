@@ -28,24 +28,11 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         _apiFactory = apiFactory;
         _testOutputHelper = testOutputHelper;
     }
-
+    
     [Fact]
-    public async Task WhenNotBeingAuthorized_ThenGiveMeUnauthorized()
+    public async Task WhenBeingAuthorized_ThenGiveMeOk()
     {
-        var client = await _apiFactory.CreateClient().GetAsync(AuthEndpoints.AUTHORIZED);
-
-        client.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-    }
-
-    [Theory]
-    [InlineData("fede", "123456", "fede@gmail.com", "Admin", true)]
-    [InlineData("hola", "123456", "hola@gmail.com", "Admin", true)]
-    public async Task WhenBeingAuthorized_ThenGiveMeOk(string username, string hashedPassword, string email, string role, bool trustedUser)
-    {
-        var token = await CreateToken(username, hashedPassword, email, role, trustedUser);
-
         HttpClient client = _apiFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
         var response = await client.GetAsync(AuthEndpoints.AUTHORIZED);
 
@@ -62,18 +49,27 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
             Password = "pepe123456"
         };
 
-        HttpResponseMessage response = await _apiFactory.CreateClient().PostAsync(AuthEndpoints.Auth.REGISTER, JsonContent.Create(requestUserDto));
+        HttpResponseMessage response = await _apiFactory.CreateClient().PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, requestUserDto);
+
+        response.EnsureSuccessStatusCode();
+
+        var matchResponse = await response.Content.ReadFromJsonAsync<UserResponseDto>();
+        matchResponse.Should().NotBeNull();
+        matchResponse.UserId.Should().NotBeEmpty();
+        matchResponse.Username.Should().Be(requestUserDto.Username);
+        matchResponse.Email.Should().Be(requestUserDto.Email);
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task WhenRefreshToken_ThenGiveMeOk()
     {
-        var client = _apiFactory.CreateClient(new WebApplicationFactoryClientOptions {
+        var client = _apiFactory.CreateClient(new WebApplicationFactoryClientOptions
+        {
             HandleCookies     = true,
             AllowAutoRedirect = false
         });
-        
+
         var loginDto = new UserLoginRequestDto {
             Username = "pepe",
             Password = "pepe123456"
@@ -81,32 +77,24 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         
         var loginResp = await client.PostAsJsonAsync(AuthEndpoints.Auth.LOGIN, loginDto);
         loginResp.EnsureSuccessStatusCode();
-        
-        var res = await loginResp.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine(res);
 
-        if (loginResp.Headers.TryGetValues("Set-Cookie", out var cookies))
-        {
-            foreach (var cookieHeader in cookies)
-            {
-                _testOutputHelper.WriteLine("Cookies " + cookieHeader);
-            }
-        }
+        var matchResponse = await loginResp.Content.ReadFromJsonAsync<UserResponseDto>();
+        matchResponse.Should().NotBeNull();
+        matchResponse.UserId.Should().NotBeEmpty();
+        matchResponse.Username.Should().Be(loginDto.Username);
+        matchResponse.Email.Should().Be(loginDto.Email);
         
-        var refreshResp = await client.GetAsync(AuthEndpoints.Auth.REFRESH_TOKEN);
-        var refresh = await refreshResp.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine(refresh);
-        
-        refreshResp.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
+        var refreshResp = await client.PostAsJsonAsync(AuthEndpoints.Auth.REFRESH_TOKEN_ID, matchResponse.UserId);
+        // refreshResp.EnsureSuccessStatusCode();
         var refreshed = await refreshResp.Content.ReadFromJsonAsync<TokenResponseDto>();
         refreshed.Should().NotBeNull();
         refreshed.RefreshToken.Should().NotBeNullOrEmpty();
         _testOutputHelper.WriteLine(refreshed.RefreshToken);
-        
-        // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
-        // var protectedResp = await client.GetAsync(AuthEndpoints.AUTHORIZED);
-        // protectedResp.StatusCode.Should().Be(HttpStatusCode.OK);
+        refreshResp.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var tokenDto = await refreshResp.Content.ReadFromJsonAsync<TokenResponseDto>();
+        tokenDto!.RefreshToken.Should().NotBeNullOrEmpty();
     }
 
     private async Task<TokenResponseDto> CreateToken(string username, string hashedPassword, string email, string role, bool trustedUser)

@@ -14,7 +14,7 @@ namespace RM.Presentation.Controllers.Authentication;
 public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBase
 {
     [HttpPost(AuthEndpoints.Auth.REGISTER)]
-    public async Task<ActionResult<User>> Register([FromBody] UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserResponseDto>> Register([FromBody] UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken)
     {
         UserResponseDto? userResponseDto = await authUseCase.RegisterAsync(userRegisterRequestDto, cancellationToken);
 
@@ -29,7 +29,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
-    public async Task<ActionResult<string>> Login([FromBody] UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<TokenResponseDto>> Login([FromBody] UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
     {
         TokenResponseDto? tokenResult = await authUseCase.LoginAsync(userLoginRequestDto, cancellationToken);
 
@@ -46,6 +46,25 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     {
         string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
         Guid? id = HttpContext.GetUserId();
+        
+        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
+        TokenResponseDto? tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
+        
+        if (tokenResponseDto == null)
+        {
+            return Unauthorized("Refresh token is invalid");
+        }
+        
+        return Ok(tokenResponseDto);;
+    }
+    
+    
+
+    [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN_ID)]
+    public async Task<ActionResult<TokenResponseDto>> RefreshTokenId([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
+        // Guid? id = HttpContext.GetUserId();
         
         var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
         var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);

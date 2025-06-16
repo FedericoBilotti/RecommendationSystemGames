@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using App;
-using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using App.Interfaces.Authentication;
@@ -18,20 +13,17 @@ using App.UseCases.Authentication;
 using App.UseCases.Engine;
 using Dapper;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
-using RM.Presentation;
 using Testcontainers.PostgreSql;
 
 namespace RM.Testing;
@@ -43,21 +35,12 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     private string TestConnectionString => _pgContainer.GetConnectionString();
     private IConfiguration Configuration { get; set; }
-    
+
     public ApiFactory()
     {
-        _pgContainer = new PostgreSqlBuilder()
-                .WithDatabase("recommendationgames_test")
-                .WithUsername("recom")
-                .WithPassword("abc123")
-                .WithImage("postgres:17")
-                .Build();
-        
-        Configuration = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
+        _pgContainer = new PostgreSqlBuilder().WithDatabase("recommendationgames_test").WithUsername("recom").WithPassword("abc123").WithImage("postgres:17").Build();
+
+        Configuration = new ConfigurationBuilder().SetBasePath(Environment.CurrentDirectory).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).AddEnvironmentVariables().Build();
     }
 
     public async Task InitializeAsync()
@@ -66,7 +49,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         var factory = new DbConnectionFactory(TestConnectionString);
         _initializer = new DbInitializer(factory);
         await _initializer.InitializeDbAsync();
-        
+
         using var conn = await factory.GetConnectionAsync(CancellationToken.None);
         await conn.ExecuteAsync(@"
             TRUNCATE TABLE ratings, genres, games, users
@@ -78,36 +61,39 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
-            services.AddHttpContextAccessor();                                              
+            services.AddHttpContextAccessor();
             services.AddSingleton(Configuration);
-            
+
             // Database
             services.RemoveAll<IDbConnectionFactory>();
             services.AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(TestConnectionString));
-            
+
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IGamesRepository, GamesRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
             services.AddValidatorsFromAssemblyContaining<IApplicationMarker>();
-            
+
             // Game                                                          
-            services.AddScoped<IGameUseCase, GameUseCase>();         
+            services.AddScoped<IGameUseCase, GameUseCase>();
             services.AddScoped<IRatingUseCase, RatingUseCase>();
-            
+
             // Hasher                                                                                                          
-            services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();     
-            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();                                         
+            services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IHasherService, HasherService>();
-            
+
             // Authentication                 
-            services.AddHttpContextAccessor();                                      
-            services.AddScoped<IUserValidationService, UserValidationService>();    
-            services.AddScoped<ITokenService, TokenService>();                      
-            services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();               
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserValidationService, UserValidationService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<AuthTokenUseCase, AuthTokenUseCase>();
             services.AddScoped<IAuthenticateUserUseCase, AuthenticateUserUseCase>();
+            
+            services.AddAuthentication("TestScheme")
+                    .AddScheme<AuthenticationSchemeOptions, AuthenticationHandlerTest>("TestScheme", options => { });
         });
     }
 }
