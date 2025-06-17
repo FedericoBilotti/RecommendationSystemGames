@@ -1,7 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /src
 
-# Copy only the project files first to leverage Docker cache
+# Copy only the project files first to leverage Docker cache 
 COPY ["RM.Presentation/RM.Presentation.csproj", "RM.Presentation/"]
 COPY ["RM.Application/RM.Application.csproj", "RM.Application/"]
 COPY ["RM.Domain/RM.Domain.csproj", "RM.Domain/"]

@@ -2,7 +2,6 @@ using App.Mappers;
 using RM.Infrastructure.Database;
 using RM.Presentation.StartUp;
 
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -26,4 +25,4 @@ await dbInitializer.InitializeDbAsync();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program;

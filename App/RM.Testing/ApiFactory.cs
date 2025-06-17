@@ -38,9 +38,18 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     public ApiFactory()
     {
-        _pgContainer = new PostgreSqlBuilder().WithDatabase("recommendationgames_test").WithUsername("recom").WithPassword("abc123").WithImage("postgres:17").Build();
+        _pgContainer = new PostgreSqlBuilder()
+                .WithDatabase("recommendationgames_test")
+                .WithUsername("recom")
+                .WithPassword("abc123")
+                .WithImage("postgres:17")
+                .Build();
 
-        Configuration = new ConfigurationBuilder().SetBasePath(Environment.CurrentDirectory).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).AddEnvironmentVariables().Build();
+        Configuration = new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
     }
 
     public async Task InitializeAsync()
@@ -50,14 +59,17 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         _initializer = new DbInitializer(factory);
         await _initializer.InitializeDbAsync();
 
-        using var conn = await factory.GetConnectionAsync(CancellationToken.None);
-        await conn.ExecuteAsync(@"
-            TRUNCATE TABLE ratings, genres, games, users
-            RESTART IDENTITY CASCADE;
-        ");
+        // using var conn = await factory.GetConnectionAsync(CancellationToken.None);
+        // await conn.ExecuteAsync(@"
+        //     TRUNCATE TABLE ratings, genres, games, users
+        //     RESTART IDENTITY CASCADE;
+        // ");
     }
 
-    public new async Task DisposeAsync() => await _pgContainer.StopAsync();
+    public new async Task DisposeAsync()
+    {
+        // await _pgContainer.StopAsync();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

@@ -76,6 +76,12 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         };
         
         var loginResp = await client.PostAsJsonAsync(AuthEndpoints.Auth.LOGIN, loginDto);
+        var response = await loginResp.Content.ReadFromJsonAsync<TokenResponseDto>();
+        response.Should().NotBeNull();
+        response.AccessToken.Should().NotBeNullOrEmpty();
+        response.RefreshToken.Should().NotBeNullOrEmpty();
+        Console.WriteLine(response.AccessToken);
+        Console.WriteLine(response.RefreshToken);
         loginResp.EnsureSuccessStatusCode();
 
         var matchResponse = await loginResp.Content.ReadFromJsonAsync<UserResponseDto>();

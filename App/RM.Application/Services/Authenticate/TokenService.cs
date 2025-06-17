@@ -19,13 +19,11 @@ public class TokenService : ITokenService
 {
     private readonly IUserRepository _userRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IConfiguration _configuration;
 
-    public TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    public TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
-        _configuration = configuration;
     }
     
     public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
@@ -110,15 +108,18 @@ public class TokenService : ITokenService
             new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
         };
 
-        DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes")); // Must be provided in other place, instead of the IConfiguration directly.
+        string expiresInMinutesString = Environment.GetEnvironmentVariable("EXPIRES_IN_MINUTES")!;
+        int expiresInMinutes = int.Parse(expiresInMinutesString);
+        DateTime expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
 
         // Change symmetric key?
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
+        string tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY")!;
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
         var token = new JwtSecurityToken(
-                issuer: _configuration.GetValue<string>("AppSettings:Issuer"), 
-                audience: _configuration.GetValue<string>("AppSettings:Audience"), 
+                issuer: Environment.GetEnvironmentVariable("ISSUER"), 
+                audience: Environment.GetEnvironmentVariable("AUDIENCE"), 
                 claims: claims,
                 expires: expires,
                 signingCredentials: credentials);
