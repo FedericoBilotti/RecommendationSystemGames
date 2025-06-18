@@ -24,8 +24,19 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return Ok(userResponseDto);
         // return CreatedAtAction();
     }
-    
+
     [HttpGet(AuthEndpoints.Auth.GET)]
+    public async Task<ActionResult<UserResponseDto>> GetUser(Guid userId, CancellationToken cancellationToken)
+    {
+        UserResponseDto? userResponseDto = await authUseCase.GetUserAsync(userId, cancellationToken);
+
+        if (userResponseDto == null)
+        {
+            return NotFound("User not found");
+        }
+
+        return Ok(userResponseDto);
+    }
     
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]

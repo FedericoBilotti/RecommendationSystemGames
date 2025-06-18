@@ -54,9 +54,11 @@ public class AuthenticateUserUseCase(
         return await tokenService.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
     }
 
-    public Task<UserResponseDto?> GetUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserResponseDto?> GetUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var user = await userRepository.GetUserById(userId, cancellationToken); 
+        
+        return user?.MapToUserResponse();
     }
 
     private async Task<User?> GetUser(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
