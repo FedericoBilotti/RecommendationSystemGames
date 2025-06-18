@@ -11,8 +11,8 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
         using var connection = await context.GetConnectionAsync(cancellationToken);
 
         int result = await connection.ExecuteAsync(new CommandDefinition("""
-                                                                         INSERT INTO users (userid, email, username, hashedPassword, role, trustedUser)
-                                                                         VALUES (@userId, @email, @username, @hashedPassword, @role, @trustedUser)
+                                                                         INSERT INTO users (userid, email, username, hashedPassword, role)
+                                                                         VALUES (@userId, @email, @username, @hashedPassword, @role)
                                                                          """, user, cancellationToken: cancellationToken));
 
         return result > 0;
@@ -71,7 +71,7 @@ public class UserRepository(IDbConnectionFactory context) : IUserRepository
                                                                              hashedPassword = @hashedPassword, 
                                                                              role = @role, 
                                                                              refreshToken = @refreshToken, 
-                                                                             refreshTokenExpirationTimeUtc = @refreshTokenExpirationTimeUtc, trustedUser = @trustedUser
+                                                                             refreshTokenExpirationTimeUtc = @refreshTokenExpirationTimeUtc
                                                                          WHERE 
                                                                              userId = @userId
                                                                          """, user, cancellationToken: cancellationToken));

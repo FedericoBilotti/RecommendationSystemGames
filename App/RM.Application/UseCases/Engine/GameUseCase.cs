@@ -2,6 +2,7 @@ using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
 using App.Mappers;
+using App.Services.Validators.Games;
 using FluentValidation;
 using RM.Domain.Entities;
 using RM.Domain.Entities.Games;
@@ -13,17 +14,17 @@ public class GameUseCase : IGameUseCase
     private readonly IGamesRepository _gamesRepository;
     private readonly IRatingRepository _ratingRepository;
     private readonly IValidator<Game> _gameValidatorService;
-    private readonly IValidator<GetAllGameRequestDto> _getAllGameValidatorService;
-    private readonly IValidator<GetAllGameOptions> _getAllGameValidatorServiceDto;
+    private readonly IValidator<GetAllGameRequestDto> _getAllDtoValidator;
+    private readonly IValidator<GetAllGameOptions> _optionsValidator;
 
-    public GameUseCase(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidatorService, IValidator<GetAllGameRequestDto> getAllGameValidatorService, 
-            IValidator<GetAllGameOptions> getAllGameValidatorServiceDto)
+    public GameUseCase(IGamesRepository gamesRepository, IRatingRepository ratingRepository, IValidator<Game> gameValidatorService, IValidator<GetAllGameRequestDto> getAllDtoValidator, 
+            IValidator<GetAllGameOptions> optionsValidator)
     {
         _gamesRepository = gamesRepository;
         _ratingRepository = ratingRepository;
         _gameValidatorService = gameValidatorService;
-        _getAllGameValidatorService = getAllGameValidatorService;
-        _getAllGameValidatorServiceDto = getAllGameValidatorServiceDto;
+        _getAllDtoValidator = getAllDtoValidator;
+        _optionsValidator = optionsValidator;
     }
 
     public async Task<GameResponseDto?> CreateAsync(CreateGameRequestDto createGameRequestDto, CancellationToken cancellationToken = default)
@@ -80,11 +81,11 @@ public class GameUseCase : IGameUseCase
 
     public async Task<GamesResponseDto> GetAllAsync(GetAllGameRequestDto getAllGameRequestDto, Guid? userId = default, CancellationToken cancellationToken = default)
     {
-        await _getAllGameValidatorService.ValidateAndThrowAsync(getAllGameRequestDto, cancellationToken);
+        await _getAllDtoValidator.ValidateAndThrowAsync(getAllGameRequestDto, cancellationToken);
         
         GetAllGameOptions gameOptions = getAllGameRequestDto.MapToOptions().WithId(userId ?? Guid.Empty);
         
-        await _getAllGameValidatorServiceDto.ValidateAndThrowAsync(gameOptions, cancellationToken);
+        await _optionsValidator.ValidateAndThrowAsync(gameOptions, cancellationToken);
         
         IEnumerable<Game> games = await _gamesRepository.GetAllAsync(gameOptions, cancellationToken);
         

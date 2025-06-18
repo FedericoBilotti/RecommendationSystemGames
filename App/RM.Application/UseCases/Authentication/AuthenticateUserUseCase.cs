@@ -54,6 +54,11 @@ public class AuthenticateUserUseCase(
         return await tokenService.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
     }
 
+    public Task<UserResponseDto?> GetUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task<User?> GetUser(UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken = default)
     {
         return userLoginRequestDto.Email != null

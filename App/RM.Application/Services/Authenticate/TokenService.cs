@@ -19,13 +19,11 @@ public class TokenService : ITokenService
 {
     private readonly IUserRepository _userRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IConfiguration _configuration;
 
-    public TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+    public TokenService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _httpContextAccessor = httpContextAccessor;
-        _configuration = configuration;
     }
     
     public async Task<TokenResponseDto> CreateTokenResponse(User user, CancellationToken cancellationToken = default)
@@ -52,39 +50,24 @@ public class TokenService : ITokenService
         return await CreateTokenResponse(user, cancellationToken);
     }
 
-    private void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
-    {
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, token, new CookieOptions
-        {
-            HttpOnly = true, 
-            Expires = expiration, 
-            IsEssential = true, 
-            Secure = true, 
-            SameSite = SameSiteMode.Strict
-        });
-    }
-
     private async Task<User?> ValidateRefreshToken(Guid? userId, string? refreshToken)
     {
         if (userId == null) return null;
         
         User? user = await _userRepository.GetUserById((Guid)userId);
-        bool isNotValid = user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpirationTimeUtc < DateTime.UtcNow;
-        return isNotValid ? null : user;
+        bool isValid = user != null && user.RefreshToken == refreshToken && user.RefreshTokenExpirationTimeUtc >= DateTime.UtcNow;
+        return isValid ? user : null;
     }
 
     private async Task<string> GenerateAndSaveRefreshToken(User user, string accessToken, DateTime expirationDateTimeUtc, CancellationToken cancellationToken = default)
     {
         string refreshToken = GenerateRefreshToken();
-        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7); // Must be provided in other place ¿?
+        DateTime refreshTokenExpirationDateTimeUtc = DateTime.UtcNow.AddDays(7);
         
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpirationTimeUtc = refreshTokenExpirationDateTimeUtc;
         
         await UpdateUserAsync(user, cancellationToken);
-        
-        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.ACCESS_TOKEN, accessToken, expirationDateTimeUtc);
-        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.REFRESH_TOKEN, user.RefreshToken, refreshTokenExpirationDateTimeUtc);
 
         return refreshToken;
     }
@@ -101,23 +84,35 @@ public class TokenService : ITokenService
     {
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new(ClaimTypes.Role, user.Role),
             new("userid", user.UserId.ToString()),
             new(AuthConstants.ADMIN_CLAIM, user.Role == AuthConstants.ADMIN_ROLE ? "true" : "false", ClaimValueTypes.String),
-            new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
+            new(AuthConstants.TRUSTED_CLAIM, user.Role switch
+            {
+                AuthConstants.ADMIN_ROLE   => "true",
+                AuthConstants.TRUSTED_ROLE => "true",
+                _                          => "false"
+            }, ClaimValueTypes.String)
         };
 
-        DateTime expires = DateTime.UtcNow.AddMinutes(_configuration.GetValue<int>("AppSettings:ExpiresInMinutes"));
+        string expiresInMinutesString = Environment.GetEnvironmentVariable("EXPIRES_IN_MINUTES") ?? throw new Exception("EXPIRES_IN_MINUTES not found");
+        int expiresInMinutes = int.Parse(expiresInMinutesString);
+        DateTime expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
 
         // Change symmetric key?
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
+        string tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY") ?? throw new Exception("TOKEN_KEY not found");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
+        string issuer = Environment.GetEnvironmentVariable("ISSUER") ?? throw new Exception("ISSUER not found");
+        string audience = Environment.GetEnvironmentVariable("AUDIENCE") ?? throw new Exception("AUDIENCE not found");
+        
         var token = new JwtSecurityToken(
-                issuer: _configuration.GetValue<string>("AppSettings:Issuer"), 
-                audience: _configuration.GetValue<string>("AppSettings:Audience"), 
+                issuer: issuer, 
+                audience: audience, 
                 claims: claims,
                 expires: expires,
                 signingCredentials: credentials);

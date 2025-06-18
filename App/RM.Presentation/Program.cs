@@ -24,3 +24,5 @@ var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
 await dbInitializer.InitializeDbAsync();
 
 app.Run();
+
+public partial class Program;

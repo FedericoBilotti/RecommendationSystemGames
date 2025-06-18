@@ -89,7 +89,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         return game;
     }
 
-    public async Task<IEnumerable<Game>> GetAllAsync(GetAllGameOptions gameOptions, CancellationToken cancellationToken = default)
+    async Task<IEnumerable<Game>> IGamesRepository.GetAllAsync(GetAllGameOptions gameOptions, CancellationToken cancellationToken = default)
     {
         using var connection = await connectionFactory.GetConnectionAsync(cancellationToken);
 

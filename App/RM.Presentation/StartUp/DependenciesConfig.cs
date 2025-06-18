@@ -33,7 +33,7 @@ public static class DependenciesConfig
         builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
         // Database
-        string connectionString = builder.Configuration.GetConnectionString("UserDatabase")!;
+        string connectionString = Environment.GetEnvironmentVariable("USER_DATABASE")!;
         builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>(_ => new DbConnectionFactory(connectionString));
         builder.Services.AddSingleton<DbInitializer>();
 
@@ -47,7 +47,7 @@ public static class DependenciesConfig
         builder.Services.AddScoped<IGameUseCase, GameUseCase>();
         builder.Services.AddScoped<IRatingUseCase, RatingUseCase>();
 
-        // Hasher
+        // Hasher                                                                
         builder.Services.AddScoped<IPasswordHasher<UserRegisterRequestDto>, PasswordHasher<UserRegisterRequestDto>>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         builder.Services.AddScoped<IHasherService, HasherService>();
@@ -77,14 +77,15 @@ public static class DependenciesConfig
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+                ValidIssuer = Environment.GetEnvironmentVariable("ISSUER"),
                 ValidateAudience = true,
-                ValidAudience = builder.Configuration["AppSettings:Audience"],
+                ValidAudience = Environment.GetEnvironmentVariable("AUDIENCE"),
                 ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("TOKEN_KEY")!)),
                 ValidateIssuerSigningKey = true
             };
 
+            // It's necessary ?
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
