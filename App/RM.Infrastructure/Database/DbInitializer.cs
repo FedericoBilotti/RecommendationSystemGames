@@ -21,7 +21,6 @@ public class DbInitializer(IDbConnectionFactory dbConnectionFactory)
                                           username TEXT NOT NULL,
                                           hashedPassword TEXT NOT NULL,
                                           role TEXT NOT NULL,
-                                          trustedUser BOOLEAN NOT NULL,
                                           refreshToken TEXT,
                                           refreshTokenExpirationTimeUtc TIMESTAMP WITH TIME ZONE
                                       )

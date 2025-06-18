@@ -22,7 +22,11 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         }
 
         return Ok(userResponseDto);
+        // return CreatedAtAction();
     }
+    
+    [HttpGet(AuthEndpoints.Auth.GET)]
+    
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
     public async Task<ActionResult<TokenResponseDto>> Login([FromBody] UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
