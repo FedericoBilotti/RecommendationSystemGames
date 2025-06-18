@@ -50,18 +50,6 @@ public class TokenService : ITokenService
         return await CreateTokenResponse(user, cancellationToken);
     }
 
-    private void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
-    {
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append(cookieName, token, new CookieOptions
-        {
-            HttpOnly = true, 
-            Expires = expiration, 
-            IsEssential = true, 
-            Secure = true, 
-            SameSite = SameSiteMode.Strict
-        });
-    }
-
     private async Task<User?> ValidateRefreshToken(Guid? userId, string? refreshToken)
     {
         if (userId == null) return null;
@@ -80,9 +68,6 @@ public class TokenService : ITokenService
         user.RefreshTokenExpirationTimeUtc = refreshTokenExpirationDateTimeUtc;
         
         await UpdateUserAsync(user, cancellationToken);
-        
-        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.ACCESS_TOKEN, accessToken, expirationDateTimeUtc);
-        WriteAuthTokenAsHttpOnlyCookie(TokenConstants.REFRESH_TOKEN, user.RefreshToken, refreshTokenExpirationDateTimeUtc);
 
         return refreshToken;
     }
@@ -108,18 +93,21 @@ public class TokenService : ITokenService
             new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
         };
 
-        string expiresInMinutesString = Environment.GetEnvironmentVariable("EXPIRES_IN_MINUTES")!;
+        string expiresInMinutesString = Environment.GetEnvironmentVariable("EXPIRES_IN_MINUTES") ?? throw new Exception("EXPIRES_IN_MINUTES not found");
         int expiresInMinutes = int.Parse(expiresInMinutesString);
         DateTime expires = DateTime.UtcNow.AddMinutes(expiresInMinutes);
 
         // Change symmetric key?
-        string tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY")!;
+        string tokenKey = Environment.GetEnvironmentVariable("TOKEN_KEY") ?? throw new Exception("TOKEN_KEY not found");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         
+        string issuer = Environment.GetEnvironmentVariable("ISSUER") ?? throw new Exception("ISSUER not found");
+        string audience = Environment.GetEnvironmentVariable("AUDIENCE") ?? throw new Exception("AUDIENCE not found");
+        
         var token = new JwtSecurityToken(
-                issuer: Environment.GetEnvironmentVariable("ISSUER"), 
-                audience: Environment.GetEnvironmentVariable("AUDIENCE"), 
+                issuer: issuer, 
+                audience: audience, 
                 claims: claims,
                 expires: expires,
                 signingCredentials: credentials);

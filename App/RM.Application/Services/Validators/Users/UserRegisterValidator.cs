@@ -25,10 +25,8 @@ public class UserRegisterValidator : AbstractValidator<UserRegisterRequestDto>
                 .WithMessage("Username must be at least 3 characters")
                 .MaximumLength(50)
                 .WithMessage("Username must be less than 50 characters")
-                .Matches("^[a-z0-9]+$")
+                .Matches("^[a-zA-Z0-9]+$")
                 .WithMessage("Username can only contain lowercase letters and numbers")
-                .Must(x => x == x.ToLower())
-                .WithMessage("Username must be lowercase")
                 .MustAsync(IsUsernameUnique)
                 .WithMessage("Username already exists");
         

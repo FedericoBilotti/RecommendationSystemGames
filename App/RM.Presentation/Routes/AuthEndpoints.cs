@@ -13,6 +13,5 @@ public static class AuthEndpoints
         public const string REGISTER = $"{AUTH_BASE}/register";
         public const string LOGIN = $"{AUTH_BASE}/login";
         public const string REFRESH_TOKEN = $"{AUTH_BASE}/refresh-token";
-        public const string REFRESH_TOKEN_ID = $"{AUTH_BASE}/refresh-token/{{id:guid}}";
     }
 }

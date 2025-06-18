@@ -40,34 +40,11 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
 
         return Ok(tokenResult);
     }
-
-    [HttpGet(AuthEndpoints.Auth.REFRESH_TOKEN)]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken(CancellationToken cancellationToken)
-    {
-        string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
-        Guid? id = HttpContext.GetUserId();
-        
-        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
-        TokenResponseDto? tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
-        
-        if (tokenResponseDto == null)
-        {
-            return Unauthorized("Refresh token is invalid");
-        }
-        
-        return Ok(tokenResponseDto);;
-    }
     
-    
-
-    [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN_ID)]
-    public async Task<ActionResult<TokenResponseDto>> RefreshTokenId([FromRoute] Guid id, CancellationToken cancellationToken)
+    [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken)
     {
-        string? refreshToken = HttpContext.Request.Cookies[TokenConstants.REFRESH_TOKEN];
-        // Guid? id = HttpContext.GetUserId();
-        
-        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = id, RefreshToken = refreshToken };
-        var tokenResponseDto = await authUseCase.RefreshTokenAsync(requestRefreshTokenDto, cancellationToken);
+        var tokenResponseDto = await authUseCase.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
         
         if (tokenResponseDto == null)
         {
