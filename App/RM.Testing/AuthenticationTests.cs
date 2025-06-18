@@ -70,7 +70,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         matchResponse.UserId.Should().NotBeEmpty();
         matchResponse.Username.Should().Be(requestUserDto.Username);
         matchResponse.Email.Should().Be(requestUserDto.Email);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         matchRegister.UserId.Should().NotBeEmpty();
         matchRegister.Username.Should().Be(requestRegisterUserDto.Username);
         matchRegister.Email.Should().Be(requestRegisterUserDto.Email);
-        responseRegister.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseRegister.StatusCode.Should().Be(HttpStatusCode.Created);
         
         // Login
 

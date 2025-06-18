@@ -21,8 +21,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
             return BadRequest("User already exists");
         }
 
-        return Ok(userResponseDto);
-        // return CreatedAtAction();
+        return CreatedAtAction(nameof(GetUser), new { userId = userResponseDto.UserId }, userResponseDto);
     }
 
     [HttpGet(AuthEndpoints.Auth.GET)]
