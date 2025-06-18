@@ -1,11 +1,8 @@
-using App.Auth;
 using App.Dtos.Games.Requests;
 using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
-using App.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RM.Domain.Entities.Games;
 using RM.Presentation.Routes;
 using RM.Presentation.Utility;
 
