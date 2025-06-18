@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
-using App.Interfaces;
 using App.Interfaces.Authentication;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using RM.Domain.Entities;
-using RM.Presentation.Controllers.Authentication;
 using RM.Presentation.Routes;
 using Xunit.Abstractions;
 
