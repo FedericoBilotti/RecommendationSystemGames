@@ -53,28 +53,47 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task WhenTryingToRegister_ThenGiveMeOk()
     {
-        var requestUserDto = new UserRegisterRequestDto
+        var client = _apiFactory.CreateClient();
+        var userRegisterRequestDto = new UserRegisterRequestDto
         {
             Username = "pepe",
             Email = "pepe@gmail.com",
             Password = "pepe123456"
         };
-
-        HttpResponseMessage response = await _apiFactory.CreateClient().PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, requestUserDto);
-        var res = await response.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine("Register: " + res);
-        response.EnsureSuccessStatusCode();
-
-        var matchResponse = await response.Content.ReadFromJsonAsync<UserResponseDto>();
-        matchResponse.Should().NotBeNull();
-        matchResponse.UserId.Should().NotBeEmpty();
-        matchResponse.Username.Should().Be(requestUserDto.Username);
-        matchResponse.Email.Should().Be(requestUserDto.Email);
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        
+        await RegisterUser(client, userRegisterRequestDto);
     }
 
     [Fact]
-    public async Task WhenRefreshToken_ThenGiveMeOk()
+    public async Task WhenTryingToLogin_ThenGiveMeOk()
+    {
+        var client = _apiFactory.CreateClient();
+        
+        // Register
+        
+        var requestUserDto = new UserRegisterRequestDto
+        {
+            Username = "pepepepepepepe",
+            Email = "pepepepepepe@gmail.com",
+            Password = "pepe123456"
+        };
+
+        await RegisterUser(client, requestUserDto);
+
+        // Login
+
+        var requestLoginUserDto = new UserLoginRequestDto
+        {
+            Email = requestUserDto.Email,
+            Username = requestUserDto.Username,
+            Password = requestUserDto.Password
+        };
+
+        await LoginUser(client, requestLoginUserDto);
+    }
+
+    [Fact]
+    public async Task WhenTryingToRefreshToken_ThenGiveMeOk()
     {
         var client = _apiFactory.CreateClient(new WebApplicationFactoryClientOptions
         {
@@ -91,15 +110,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
             Password = "pepe123456"
         };
 
-        HttpResponseMessage responseRegister = await client.PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, requestRegisterUserDto);
-        responseRegister.EnsureSuccessStatusCode();
-
-        var matchRegister = await responseRegister.Content.ReadFromJsonAsync<UserResponseDto>();
-        matchRegister.Should().NotBeNull();
-        matchRegister.UserId.Should().NotBeEmpty();
-        matchRegister.Username.Should().Be(requestRegisterUserDto.Username);
-        matchRegister.Email.Should().Be(requestRegisterUserDto.Email);
-        responseRegister.StatusCode.Should().Be(HttpStatusCode.Created);
+        var responseRegister = await RegisterUser(client, requestRegisterUserDto);
         
         // Login
 
@@ -110,18 +121,11 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
             Password = requestRegisterUserDto.Password
         };
         
-        HttpResponseMessage responseLogin = await client.PostAsJsonAsync(AuthEndpoints.Auth.LOGIN, requestLoginUserDto);
-        responseLogin.EnsureSuccessStatusCode();
-        
-        var matchLogin = await responseLogin.Content.ReadFromJsonAsync<TokenResponseDto>();
-        matchLogin.Should().NotBeNull();
-        matchLogin.AccessToken.Should().NotBeEmpty();
-        matchLogin.RefreshToken.Should().NotBeEmpty();
-        responseLogin.StatusCode.Should().Be(HttpStatusCode.OK);
+        var responseLogin = await LoginUser(client, requestLoginUserDto);
         
         // Refresh token
         
-        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = matchRegister.UserId, RefreshToken = matchLogin.RefreshToken };
+        var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = responseRegister.UserId, RefreshToken = responseLogin.RefreshToken };
         
         HttpResponseMessage responseRefresh = await client.PostAsJsonAsync(AuthEndpoints.Auth.REFRESH_TOKEN, requestRefreshTokenDto);
         responseRefresh.EnsureSuccessStatusCode();
@@ -146,7 +150,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
     }
     
     [Fact]
-    public async Task WhenNotBeingAdmin_ThenGiveMeUnauthorized()
+    public async Task WhenNotBeingAdmin_ThenGiveMeForbidden()
     {
         TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.USER_ROLE, email: "pepeTest@gmail.com");
 
@@ -170,7 +174,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
     }
     
     [Fact]
-    public async Task WhenNotBeingTrustedUser_ThenGiveMeUnauthorized()
+    public async Task WhenNotBeingTrustedUser_ThenGiveMeForbidden()
     {
         TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.USER_ROLE, email: "pepeTest@gmail.com");
 
@@ -179,6 +183,33 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
 
         HttpResponseMessage response = await client.GetAsync(AuthEndpoints.TRUSTED_USER);
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    private async Task<UserResponseDto> RegisterUser(HttpClient client, UserRegisterRequestDto registerRequestUserDto)
+    {
+        HttpResponseMessage response = await client.PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, registerRequestUserDto);
+        response.EnsureSuccessStatusCode();
+
+        var matchResponse = await response.Content.ReadFromJsonAsync<UserResponseDto>();
+        matchResponse.Should().NotBeNull();
+        matchResponse.UserId.Should().NotBeEmpty();
+        matchResponse.Username.Should().Be(registerRequestUserDto.Username);
+        matchResponse.Email.Should().Be(registerRequestUserDto.Email);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        return matchResponse;
+    }
+
+    private async Task<TokenResponseDto> LoginUser(HttpClient client, UserLoginRequestDto loginRequestUserDto)
+    {
+        var responseLogin = await client.PostAsJsonAsync(AuthEndpoints.Auth.LOGIN, loginRequestUserDto);
+        responseLogin.EnsureSuccessStatusCode();
+        
+        var matchLogin = await responseLogin.Content.ReadFromJsonAsync<TokenResponseDto>();
+        matchLogin.Should().NotBeNull();
+        matchLogin.AccessToken.Should().NotBeEmpty();
+        matchLogin.RefreshToken.Should().NotBeEmpty();
+        responseLogin.StatusCode.Should().Be(HttpStatusCode.OK);
+        return matchLogin;
     }
     
     private async Task<TokenResponseDto> GetJwtAsync(Guid userId, string username, string role, string email)
