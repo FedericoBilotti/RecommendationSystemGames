@@ -93,7 +93,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task WhenRefreshToken_ThenGiveMeOk()
+    public async Task WhenTryingToRefreshToken_ThenGiveMeOk()
     {
         var client = _apiFactory.CreateClient(new WebApplicationFactoryClientOptions
         {
