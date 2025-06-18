@@ -19,7 +19,7 @@
     image: app-api-recommendationgames:1.2.1
     build:
       context: .
-      dockerfile: RM.Presentation/Dockerfile
+      dockerfile: .
     container_name: api-recommendationgames
     depends_on:
       - postgres-db
