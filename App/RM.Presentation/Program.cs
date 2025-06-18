@@ -17,7 +17,7 @@ WebApplication app = builder.Build();
 
 app.UseOpenApi();
 
-app.MapHealthChecks("_health");
+app.MapHealthChecks("/health");
 
 // app.UseHttpsRedirection();
 app.UseAuthentication();
