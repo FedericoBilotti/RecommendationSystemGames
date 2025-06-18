@@ -16,7 +16,7 @@
       - postgres-data:/var/lib/postgresql/data
     
   api-recommendationgames:
-    image: app-api-recommendationgames:1.1
+    image: app-api-recommendationgames:1.2
     build:
       context: .
       dockerfile: RM.Presentation/Dockerfile
