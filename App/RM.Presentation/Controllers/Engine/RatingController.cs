@@ -16,29 +16,34 @@ public class RatingController(IRatingUseCase ratingUseCase) : ControllerBase
 {
     [Authorize]
     [HttpPut(ApiEndpoints.V1.Games.RATE)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RateGame([FromRoute] Guid id, [FromBody] GameRateRequestDto gameRateRequestDto, CancellationToken cancellationToken)
     {
-        Guid? userId = HttpContext.GetUserId(); // gonna throw exception cause i don't add user GUID yet.
+        Guid? userId = HttpContext.GetUserId();
         bool result = await ratingUseCase.RateGameAsync(id, gameRateRequestDto.Rating, userId!.Value, cancellationToken);
-        return result ? Ok() : NotFound();
+        return result ? Ok() : NotFound("Game not found");
     }
 
     [Authorize]
     [HttpDelete(ApiEndpoints.V1.Games.DELETE_RATE)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRating([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         Guid? userId = HttpContext.GetUserId();
         bool result = await ratingUseCase.DeleteRatingAsync(id, userId!.Value, cancellationToken);
-        return result ? Ok() : NotFound();
+        return result ? Ok() : NotFound("Game not found");
     }
     
     [Authorize]
     [HttpGet(ApiEndpoints.V1.Ratings.GET_USER_RATINGS)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUserRatings(CancellationToken cancellationToken)
     {
         Guid? userId = HttpContext.GetUserId();
-        IEnumerable<GameRating> ratings = await ratingUseCase.GetUserRatingsAsync(userId!.Value, cancellationToken);
-        IEnumerable<GameRatingResponseDto> response = ratings.MapToResponse();
-        return Ok(response);
+        IEnumerable<GameRatingResponseDto> ratings = await ratingUseCase.GetUserRatingsAsync(userId!.Value, cancellationToken);
+        return Ok(ratings);
     }
 }
