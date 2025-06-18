@@ -25,7 +25,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     }
 
     [HttpGet(AuthEndpoints.Auth.GET)]
-    public async Task<ActionResult<UserResponseDto>> GetUser(Guid userId, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserResponseDto>> GetUser([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         UserResponseDto? userResponseDto = await authUseCase.GetUserAsync(userId, cancellationToken);
 
