@@ -1,10 +1,14 @@
 using App.Mappers;
 using RM.Infrastructure.Database;
+using RM.Presentation.Health;
 using RM.Presentation.StartUp;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddHealthChecks()
+                .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.NAME);
 
 builder.AddDependencies();
 builder.AddJwtDependencies();
@@ -12,6 +16,8 @@ builder.AddJwtDependencies();
 WebApplication app = builder.Build();
 
 app.UseOpenApi();
+
+app.MapHealthChecks("/health");
 
 // app.UseHttpsRedirection();
 app.UseAuthentication();
