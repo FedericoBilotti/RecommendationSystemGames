@@ -31,6 +31,14 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
+    public async Task WhenNotBeingAuthorized_ThenGiveMeUnauthorized()
+    {
+        HttpClient client = _apiFactory.CreateClient();
+        HttpResponseMessage response = await client.GetAsync(AuthEndpoints.AUTHORIZED);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
     public async Task WhenBeingAuthorized_ThenGiveMeOk()
     {
         TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.USER_ROLE, email: "pepeTest@gmail.com");
@@ -53,7 +61,8 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         };
 
         HttpResponseMessage response = await _apiFactory.CreateClient().PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, requestUserDto);
-
+        var res = await response.Content.ReadAsStringAsync();
+        _testOutputHelper.WriteLine("Register: " + res);
         response.EnsureSuccessStatusCode();
 
         var matchResponse = await response.Content.ReadFromJsonAsync<UserResponseDto>();
@@ -61,7 +70,7 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         matchResponse.UserId.Should().NotBeEmpty();
         matchResponse.Username.Should().Be(requestUserDto.Username);
         matchResponse.Email.Should().Be(requestUserDto.Email);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
     [Fact]
@@ -83,9 +92,6 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         };
 
         HttpResponseMessage responseRegister = await client.PostAsJsonAsync(AuthEndpoints.Auth.REGISTER, requestRegisterUserDto);
-        var readRegister = await responseRegister.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine("Register: " + readRegister);
-
         responseRegister.EnsureSuccessStatusCode();
 
         var matchRegister = await responseRegister.Content.ReadFromJsonAsync<UserResponseDto>();
@@ -105,9 +111,6 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         };
         
         HttpResponseMessage responseLogin = await client.PostAsJsonAsync(AuthEndpoints.Auth.LOGIN, requestLoginUserDto);
-        var readLogin = await responseLogin.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine("Login: " + readLogin);
-
         responseLogin.EnsureSuccessStatusCode();
         
         var matchLogin = await responseLogin.Content.ReadFromJsonAsync<TokenResponseDto>();
@@ -121,9 +124,6 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         var requestRefreshTokenDto = new RefreshTokenRequestDto { UserId = matchRegister.UserId, RefreshToken = matchLogin.RefreshToken };
         
         HttpResponseMessage responseRefresh = await client.PostAsJsonAsync(AuthEndpoints.Auth.REFRESH_TOKEN, requestRefreshTokenDto);
-        var readRefresh = await responseRefresh.Content.ReadAsStringAsync();
-        _testOutputHelper.WriteLine("Refresh: " + readRefresh);
-        
         responseRefresh.EnsureSuccessStatusCode();
         
         var matchRefresh = await responseRefresh.Content.ReadFromJsonAsync<TokenResponseDto>();
@@ -131,6 +131,54 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
         matchRefresh.AccessToken.Should().NotBeEmpty();
         matchRefresh.RefreshToken.Should().NotBeEmpty();
         responseRefresh.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task WhenBeingAdmin_ThenGiveMeOk()
+    {
+        TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.ADMIN_ROLE, email: "pepeTest@gmail.com");
+
+        HttpClient client = _apiFactory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+        HttpResponseMessage response = await client.GetAsync(AuthEndpoints.ADMIN);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task WhenNotBeingAdmin_ThenGiveMeUnauthorized()
+    {
+        TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.USER_ROLE, email: "pepeTest@gmail.com");
+
+        HttpClient client = _apiFactory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+        HttpResponseMessage response = await client.GetAsync(AuthEndpoints.ADMIN);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+    
+    [Fact]
+    public async Task WhenBeingTrustedUser_ThenGiveMeOk()
+    {
+        TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.TRUSTED_ROLE, email: "pepeTest@gmail.com");
+
+        HttpClient client = _apiFactory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+        HttpResponseMessage response = await client.GetAsync(AuthEndpoints.TRUSTED_USER);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task WhenNotBeingTrustedUser_ThenGiveMeUnauthorized()
+    {
+        TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: "pepeTest", role: AuthConstants.USER_ROLE, email: "pepeTest@gmail.com");
+
+        HttpClient client = _apiFactory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+        HttpResponseMessage response = await client.GetAsync(AuthEndpoints.TRUSTED_USER);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
     
     private async Task<TokenResponseDto> GetJwtAsync(Guid userId, string username, string role, string email)
@@ -141,7 +189,6 @@ public class AuthenticationTests : IClassFixture<ApiFactory>
             Username = username,
             Email = email,
             Role = role,
-            TrustedUser = true,
             HashedPassword = "dummy"
         };
 

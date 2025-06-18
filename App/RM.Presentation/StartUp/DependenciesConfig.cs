@@ -85,6 +85,7 @@ public static class DependenciesConfig
                 ValidateIssuerSigningKey = true
             };
 
+            // It's necessary ?
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>

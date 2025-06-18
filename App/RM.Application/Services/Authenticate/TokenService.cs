@@ -90,7 +90,12 @@ public class TokenService : ITokenService
             new(ClaimTypes.Role, user.Role),
             new("userid", user.UserId.ToString()),
             new(AuthConstants.ADMIN_CLAIM, user.Role == AuthConstants.ADMIN_ROLE ? "true" : "false", ClaimValueTypes.String),
-            new(AuthConstants.TRUSTED_CLAIM, user.TrustedUser ? "true" : "false", ClaimValueTypes.Boolean)
+            new(AuthConstants.TRUSTED_CLAIM, user.Role switch
+            {
+                AuthConstants.ADMIN_ROLE   => "true",
+                AuthConstants.TRUSTED_ROLE => "true",
+                _                          => "false"
+            }, ClaimValueTypes.String)
         };
 
         string expiresInMinutesString = Environment.GetEnvironmentVariable("EXPIRES_IN_MINUTES") ?? throw new Exception("EXPIRES_IN_MINUTES not found");

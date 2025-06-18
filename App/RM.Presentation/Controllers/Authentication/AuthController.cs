@@ -4,9 +4,7 @@ using App.Dtos.Authentication.Response;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RM.Domain.Entities;
 using RM.Presentation.Routes;
-using RM.Presentation.Utility;
 
 namespace RM.Presentation.Controllers.Authentication;
 
@@ -24,8 +22,6 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         }
 
         return Ok(userResponseDto);
-        // Must return the endpoint of the profile (if it exists) and the userId
-        return Created($"{AuthEndpoints.Auth.REGISTER}/{userResponseDto.UserId}", userResponseDto);
     }
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
@@ -53,12 +49,13 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         
         return Ok(tokenResponseDto);;
     }
+    
+    #region Examples
 
     [Authorize]
     [HttpGet(AuthEndpoints.AUTHORIZED)]
     public IActionResult AuthorizeOnlyEndpoint()
     {
-        // Examples
         return Ok("You are authenticated");
     }
     
@@ -66,7 +63,6 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     [HttpGet(AuthEndpoints.TRUSTED_USER)]
     public IActionResult TrustedOnlyEndpoint()
     {
-        // Examples
         return Ok("You are a trusted user");
     }
 
@@ -74,7 +70,8 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
     [HttpGet(AuthEndpoints.ADMIN)]
     public IActionResult AuthenticatedAdmin()
     {
-        // Examples
         return Ok("You are authenticated as an admin");
     }
+    
+    #endregion
 }
