@@ -1,4 +1,6 @@
+using App.Dtos.Games.Responses;
 using App.Interfaces.Engine;
+using App.Mappers;
 using FluentValidation;
 using FluentValidation.Results;
 using RM.Domain.Entities.Games;
@@ -32,8 +34,9 @@ public class RatingUseCase(IRatingRepository ratingRepository, IGamesRepository 
         return ratingRepository.DeleteRatingAsync(gameId, userId, cancellationToken);
     }
 
-    public Task<IEnumerable<GameRating>> GetUserRatingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<GameRatingResponseDto>> GetUserRatingsAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return ratingRepository.GetUserRatingsAsync(userId, cancellationToken);
+        IEnumerable<GameRating> ratings = await ratingRepository.GetUserRatingsAsync(userId, cancellationToken);
+        return ratings.MapToResponse();
     }
 }

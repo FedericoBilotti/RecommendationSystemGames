@@ -16,6 +16,8 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 {
     [Authorize(AuthConstants.TRUSTED_ROLE)]
     [HttpPost(ApiEndpoints.V1.Games.CREATE)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GameResponseDto>> Create([FromBody] CreateGameRequestDto createGameRequest, CancellationToken cancellationToken = default)
     {
         GameResponseDto? gameResponseDto = await gameUseCase.CreateAsync(createGameRequest, cancellationToken);
@@ -30,6 +32,8 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 
     [Authorize]
     [HttpGet(ApiEndpoints.V1.Games.GET)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponseDto>> Get([FromRoute] string idOrSlug, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
@@ -48,6 +52,7 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 
     [Authorize]
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequestDto getAllGameRequestDto, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
@@ -57,10 +62,11 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 
     [Authorize(AuthConstants.TRUSTED_ROLE)]
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponseDto>> Update([FromBody] UpdateGameRequestDto updateGameRequest, [FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
-        // Maybe there is a problem if i dont map before
-        // Game game = updateGameRequest.MapToGame(id);
         Guid? userId = HttpContext.GetUserId();
         GameResponseDto? gameResponseDto = await gameUseCase.UpdateAsync(updateGameRequest, id, userId, cancellationToken);
 
@@ -74,6 +80,9 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
 
     [Authorize(AuthConstants.ADMIN_ROLE)]
     [HttpDelete(ApiEndpoints.V1.Games.DELETE)]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         bool wasDeleted = await gameUseCase.DeleteByIdAsync(id, cancellationToken);
