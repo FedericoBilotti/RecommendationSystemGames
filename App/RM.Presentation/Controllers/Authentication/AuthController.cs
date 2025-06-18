@@ -21,11 +21,21 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
             return BadRequest("User already exists");
         }
 
-        return Ok(userResponseDto);
-        // return CreatedAtAction();
+        return CreatedAtAction(nameof(GetUser), new { userId = userResponseDto.UserId }, userResponseDto);
     }
-    
+
     [HttpGet(AuthEndpoints.Auth.GET)]
+    public async Task<ActionResult<UserResponseDto>> GetUser([FromRoute] Guid userId, CancellationToken cancellationToken)
+    {
+        UserResponseDto? userResponseDto = await authUseCase.GetUserAsync(userId, cancellationToken);
+
+        if (userResponseDto == null)
+        {
+            return NotFound("User not found");
+        }
+
+        return Ok(userResponseDto);
+    }
     
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
