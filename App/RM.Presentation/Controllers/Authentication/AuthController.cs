@@ -1,6 +1,7 @@
 using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Dtos.Authentication.Response;
+using App.Dtos.Games.Responses;
 using App.Interfaces.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,8 @@ namespace RM.Presentation.Controllers.Authentication;
 public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBase
 {
     [HttpPost(AuthEndpoints.Auth.REGISTER)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserResponseDto>> Register([FromBody] UserRegisterRequestDto userRegisterRequestDto, CancellationToken cancellationToken)
     {
         UserResponseDto? userResponseDto = await authUseCase.RegisterAsync(userRegisterRequestDto, cancellationToken);
@@ -24,7 +27,10 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return CreatedAtAction(nameof(GetUser), new { userId = userResponseDto.UserId }, userResponseDto);
     }
 
+    [Authorize]
     [HttpGet(AuthEndpoints.Auth.GET)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserResponseDto>> GetUser([FromRoute] Guid userId, CancellationToken cancellationToken)
     {
         UserResponseDto? userResponseDto = await authUseCase.GetUserAsync(userId, cancellationToken);
@@ -36,22 +42,26 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
 
         return Ok(userResponseDto);
     }
-    
 
     [HttpPost(AuthEndpoints.Auth.LOGIN)]
+    [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TokenResponseDto>> Login([FromBody] UserLoginRequestDto userLoginRequestDto, CancellationToken cancellationToken)
     {
         TokenResponseDto? tokenResult = await authUseCase.LoginAsync(userLoginRequestDto, cancellationToken);
 
         if (tokenResult == null)
         {
-            return BadRequest("User not found or the password is wrong");
+            return NotFound("User not found or the password is wrong");
         }
 
         return Ok(tokenResult);
     }
     
     [HttpPost(AuthEndpoints.Auth.REFRESH_TOKEN)]
+    [ProducesResponseType(typeof(TokenResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto refreshTokenRequestDto, CancellationToken cancellationToken)
     {
         var tokenResponseDto = await authUseCase.RefreshTokenAsync(refreshTokenRequestDto, cancellationToken);
