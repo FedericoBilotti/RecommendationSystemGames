@@ -27,6 +27,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
         return CreatedAtAction(nameof(GetUser), new { userId = userResponseDto.UserId }, userResponseDto);
     }
 
+    [Authorize]
     [HttpGet(AuthEndpoints.Auth.GET)]
     [ProducesResponseType(typeof(UserResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
