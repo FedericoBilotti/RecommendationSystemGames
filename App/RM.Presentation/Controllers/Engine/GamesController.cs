@@ -53,6 +53,7 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
     [Authorize]
     [HttpGet(ApiEndpoints.V1.Games.GET_ALL)]
     [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GamesResponseDto>> GetAll([FromQuery] GetAllGameRequestDto getAllGameRequestDto, CancellationToken cancellationToken = default)
     {
         Guid? userId = HttpContext.GetUserId();
