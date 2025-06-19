@@ -2,7 +2,7 @@
   
   postgres-db:
     image: postgres:17
-    container_name: postgres-db
+    container_name: postgres-recom-db
     restart: always
     env_file:
       - .env
@@ -16,7 +16,7 @@
       - postgres-data:/var/lib/postgresql/data
     
   api-recommendationgames:
-    image: app-api-recommendationgames:1.2.2
+    image: app-api-recommendationgames:1.3
     build:
       context: .
       dockerfile: /Dockerfile
