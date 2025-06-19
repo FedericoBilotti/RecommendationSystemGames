@@ -180,6 +180,88 @@ public class GameTests : IClassFixture<ApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    [Fact]
+    public async Task WhenTryingToUpdate_ThenGiveMeOk()
+    {
+        var client = await GetClientAuthorized();
+        
+        var gameResponseDto = await CreateGame("Denos", client);
+        
+        var updateGameRequestDto = new UpdateGameRequestDto
+        {
+            Title = "Denos 2",
+            Description = "Dummy description 2",
+            YearOfRelease = 2023,
+            Genre = new List<string> { "Action", "Adventure" }
+        };
+
+        var response = await client.PutAsJsonAsync(ApiEndpoints.V1.Games.UPDATE.Replace("{id:Guid}", gameResponseDto.GameId.ToString()), updateGameRequestDto);
+        response.EnsureSuccessStatusCode();
+        
+        var matchResponse = await response.Content.ReadFromJsonAsync<GameResponseDto>();
+        matchResponse.Should().NotBeNull();
+        matchResponse.GameId.Should().Be(gameResponseDto.GameId);
+        matchResponse.Title.Should().Be(updateGameRequestDto.Title);
+        matchResponse.Description.Should().Be(updateGameRequestDto.Description);
+        matchResponse.YearOfRelease.Should().Be(updateGameRequestDto.YearOfRelease);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task WhenTryingToUpdate_AndBeingUser_ThenGiveMeForbidden()
+    {
+        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        
+        var gameCreated = await CreateGame("Another Dummy Game 2", await GetClientAuthorized());
+        
+        var updateGameRequestDto = new UpdateGameRequestDto
+        {
+            Title = "Another Dummy Game 3",
+            Description = "Dummy description 2",
+            YearOfRelease = 2023,
+            Genre = new List<string> { "Action", "Adventure" }
+        };
+
+        var response = await client.PutAsJsonAsync(ApiEndpoints.V1.Games.UPDATE.Replace("{id:Guid}", gameCreated.GameId.ToString()), updateGameRequestDto);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task WhenTryingToUpdate_AndNotBeingAuthorized_ThenGiveMeUnauthorized()
+    {
+        var client = _apiFactory.CreateClient();
+        
+        var gameCreated = await CreateGame("Another Dummy Game", await GetClientAuthorized());
+        
+        var updateGameRequestDto = new UpdateGameRequestDto
+        {
+            Title = "Another Dummy Game 2",
+            Description = "Dummy description 2",
+            YearOfRelease = 2023,
+            Genre = new List<string> { "Action", "Adventure" }
+        };
+
+        var response = await client.PutAsJsonAsync(ApiEndpoints.V1.Games.UPDATE.Replace("{id:Guid}", gameCreated.GameId.ToString()), updateGameRequestDto);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task WhenTryingToUpdate_ThenGiveMeNotFound()
+    {
+        var client = _apiFactory.CreateClient();
+        
+        var updateGameRequestDto = new UpdateGameRequestDto
+        {
+            Title = "Another Dummy Game 2",
+            Description = "Dummy description 2",
+            YearOfRelease = 2023,
+            Genre = new List<string> { "Action", "Adventure" }
+        };
+
+        var response = await client.PutAsJsonAsync(ApiEndpoints.V1.Games.UPDATE.Replace("{id:Guid}", "2"), updateGameRequestDto);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     private async Task<HttpClient> GetClientAuthorized(string username = "pepeTest", string email = "pepeTest@gmail.com", string role = AuthConstants.ADMIN_ROLE)
     {
         TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: username, email: email, role: role);
