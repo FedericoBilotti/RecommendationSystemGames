@@ -15,7 +15,7 @@ using RM.Domain.Entities;
 using RM.Presentation.Routes;
 using Xunit.Abstractions;
 
-namespace RM.Testing;
+namespace RM.Testing.Integration;
 
 public class AuthenticationTests : IClassFixture<ApiFactory>
 {
