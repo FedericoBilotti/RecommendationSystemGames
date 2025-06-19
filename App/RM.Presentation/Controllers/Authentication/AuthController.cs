@@ -21,7 +21,7 @@ public class AuthController(IAuthenticateUserUseCase authUseCase) : ControllerBa
 
         if (userResponseDto == null)
         {
-            return BadRequest("User already exists");
+            return Conflict("User already exists");
         }
 
         return CreatedAtAction(nameof(GetUser), new { userId = userResponseDto.UserId }, userResponseDto);
