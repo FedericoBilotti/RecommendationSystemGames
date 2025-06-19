@@ -65,6 +65,8 @@ public class GamesController(IGameUseCase gameUseCase) : ControllerBase
     [HttpPut(ApiEndpoints.V1.Games.UPDATE)]
     [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationFailureResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponseDto>> Update([FromBody] UpdateGameRequestDto updateGameRequest, [FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
