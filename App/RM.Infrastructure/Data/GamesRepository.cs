@@ -79,7 +79,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
         var genres = await connection.QueryAsync<string>(new CommandDefinition("""
                                                                                SELECT name FROM genres
                                                                                WHERE gameId = @gameId
-                                                                               """, new { game.Slug }, cancellationToken: cancellationToken));
+                                                                               """, new { gameId = game.GameId  }, cancellationToken: cancellationToken));
 
         foreach (var genre in genres)
         {

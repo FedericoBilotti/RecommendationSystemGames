@@ -11,7 +11,7 @@ public class RatingUseCase(IRatingRepository ratingRepository, IGamesRepository 
 {
     public async Task<bool> RateGameAsync(Guid gameId, int rating, Guid userId, CancellationToken cancellationToken = default)
     {
-        if (rating is < 0 or > 5)
+        if (rating is < 1 or > 5)
         {
             throw new ValidationException([
                 new ValidationFailure

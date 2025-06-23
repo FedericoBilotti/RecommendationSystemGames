@@ -39,30 +39,6 @@ public class GameTests : IClassFixture<ApiFactory>
 
         await CreateGame(title, client);
     }
-
-    private static async Task<GameResponseDto> CreateGame(string title, HttpClient client)
-    {
-        var gameRequestDto = new CreateGameRequestDto
-        {
-            Title = title,
-            Description = "Dummy description",
-            YearOfRelease = 2022,
-            Genre = new List<string> { "Action", "Adventure" }
-        };
-
-        var response = await client.PostAsJsonAsync(ApiEndpoints.V1.Games.CREATE, gameRequestDto);
-        response.EnsureSuccessStatusCode();
-        
-        var matchResponse = await response.Content.ReadFromJsonAsync<GameResponseDto>();
-        matchResponse.Should().NotBeNull();
-        matchResponse.GameId.Should().NotBeEmpty();
-        matchResponse.Title.Should().Be(gameRequestDto.Title);
-        matchResponse.Description.Should().Be(gameRequestDto.Description);
-        matchResponse.YearOfRelease.Should().Be(gameRequestDto.YearOfRelease);
-        matchResponse.Genre.Should().BeEquivalentTo(gameRequestDto.Genre);
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        return matchResponse;
-    }
     
     [Fact]
     public async Task WhenTryingToCreateAGame_AndNotBeingTrustedRole_ThenGiveMeForbidden()
@@ -299,6 +275,30 @@ public class GameTests : IClassFixture<ApiFactory>
         var response = await client.DeleteAsync(ApiEndpoints.V1.Games.DELETE.Replace("{id:Guid}", gameResponseDto.GameId.ToString()));
         
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    private static async Task<GameResponseDto> CreateGame(string title, HttpClient client)
+    {
+        var gameRequestDto = new CreateGameRequestDto
+        {
+            Title = title,
+            Description = "Dummy description",
+            YearOfRelease = 2022,
+            Genre = new List<string> { "Action", "Adventure" }
+        };
+
+        var response = await client.PostAsJsonAsync(ApiEndpoints.V1.Games.CREATE, gameRequestDto);
+        response.EnsureSuccessStatusCode();
+        
+        var matchResponse = await response.Content.ReadFromJsonAsync<GameResponseDto>();
+        matchResponse.Should().NotBeNull();
+        matchResponse.GameId.Should().NotBeEmpty();
+        matchResponse.Title.Should().Be(gameRequestDto.Title);
+        matchResponse.Description.Should().Be(gameRequestDto.Description);
+        matchResponse.YearOfRelease.Should().Be(gameRequestDto.YearOfRelease);
+        matchResponse.Genre.Should().BeEquivalentTo(gameRequestDto.Genre);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        return matchResponse;
     }
 
     private async Task<HttpClient> GetClientWithAuth(string username = "pepeTest", string email = "pepeTest@gmail.com", string role = AuthConstants.ADMIN_ROLE)

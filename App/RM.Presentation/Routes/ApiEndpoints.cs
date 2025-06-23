@@ -18,8 +18,8 @@ public static class ApiEndpoints
             public const string UPDATE = $"{BASE}/{{id:Guid}}";
             public const string DELETE = $"{BASE}/{{id:Guid}}";
             
-            public const string RATE = $"{BASE}/{{id:guid}}/ratings";
-            public const string DELETE_RATE = $"{BASE}/{{id:guid}}/ratings";
+            public const string RATE = $"{BASE}/{{id:Guid}}/ratings";
+            public const string DELETE_RATE = $"{BASE}/{{id:Guid}}/ratings";
         }
 
         public static class Ratings
