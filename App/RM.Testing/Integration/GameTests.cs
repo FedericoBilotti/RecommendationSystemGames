@@ -35,7 +35,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [InlineData("pepeTesting", "pepeTesting@gmail.com", AuthConstants.ADMIN_ROLE, "Other Dummy Game")]
     public async Task WhenTryingToCreateAGame_ThenGiveMeCreated(string username, string email, string role, string title)
     {
-        HttpClient client = await GetClientAuthorized(username, email, role);
+        HttpClient client = await GetClientWithAuth(username, email, role);
 
         await CreateGame(title, client);
     }
@@ -67,7 +67,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task WhenTryingToCreateAGame_AndNotBeingTrustedRole_ThenGiveMeForbidden()
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
         
         var gameRequestDto = new CreateGameRequestDto
         {
@@ -84,7 +84,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task WhenTryingToGetAGame_ThenGiveMeOk()
     {
-        var client = await GetClientAuthorized();
+        var client = await GetClientWithAuth();
 
         var gameResponseDto = await CreateGame("The Dummy", client);
         
@@ -124,7 +124,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [InlineData(1, 25)]
     public async Task WhenTryingToGetAllGames_ThenGiveMeOk(int page, int pageSize)
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
 
         var url = $"{ApiEndpoints.V1.Games.GET_ALL}?page={page}&pageSize={pageSize}";
         var response = await client.GetAsync(url);
@@ -140,7 +140,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [InlineData(-1, 5)]
     public async Task WhenTryingToGetAllGames_ThenGiveMeBadRequest(int page, int pageSize)
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
 
         var url = $"{ApiEndpoints.V1.Games.GET_ALL}?page={page}&pageSize={pageSize}";
         
@@ -156,7 +156,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [InlineData(1, 15, "Dum", 2022, "-yearofrelease")]
     public async Task WhenTryingToGetAllGames_FilteringAndSorting_ThenGiveMeOk(int page, int pageSize, string title, int yearOfRelease, string sortBy)
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
 
         var url = $"{ApiEndpoints.V1.Games.GET_ALL}?sortBy={sortBy}&page={page}&pageSize={pageSize}&title={title}&yearOfRelease={yearOfRelease}";
         var response = await client.GetAsync(url);
@@ -172,7 +172,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [InlineData(5, 25, "y", 2022, "-yearofreleas")]
     public async Task WhenTryingToGetAllGames_FilteringAndSorting_ThenGiveMeBadRequest(int page, int pageSize, string title, int yearOfRelease, string sortBy)
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
 
         var url = $"{ApiEndpoints.V1.Games.GET_ALL}?sortBy={sortBy}&page={page}&pageSize={pageSize}&title={title}&yearOfRelease={yearOfRelease}";
         var response = await client.GetAsync(url);
@@ -183,7 +183,7 @@ public class GameTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task WhenTryingToUpdate_ThenGiveMeOk()
     {
-        var client = await GetClientAuthorized();
+        var client = await GetClientWithAuth();
         
         var gameResponseDto = await CreateGame("Denos", client);
         
@@ -210,9 +210,9 @@ public class GameTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task WhenTryingToUpdate_AndBeingUser_ThenGiveMeForbidden()
     {
-        var client = await GetClientAuthorized(role: AuthConstants.USER_ROLE);
+        var client = await GetClientWithAuth(role: AuthConstants.USER_ROLE);
         
-        var gameCreated = await CreateGame("Another Dummy Game 2", await GetClientAuthorized());
+        var gameCreated = await CreateGame("Another Dummy Game 2", await GetClientWithAuth());
         
         var updateGameRequestDto = new UpdateGameRequestDto
         {
@@ -231,7 +231,7 @@ public class GameTests : IClassFixture<ApiFactory>
     {
         var client = _apiFactory.CreateClient();
         
-        var gameCreated = await CreateGame("Another Dummy Game", await GetClientAuthorized());
+        var gameCreated = await CreateGame("Another Dummy Game", await GetClientWithAuth());
         
         var updateGameRequestDto = new UpdateGameRequestDto
         {
@@ -262,7 +262,46 @@ public class GameTests : IClassFixture<ApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    private async Task<HttpClient> GetClientAuthorized(string username = "pepeTest", string email = "pepeTest@gmail.com", string role = AuthConstants.ADMIN_ROLE)
+    [Fact]
+    public async Task WhenTryingToDelete_ThenGiveMeOk()
+    {
+        var client = await GetClientWithAuth();
+        
+        var gameResponseDto = await CreateGame("Denos 2", client);
+        
+        var response = await client.DeleteAsync(ApiEndpoints.V1.Games.DELETE.Replace("{id:Guid}", gameResponseDto.GameId.ToString()));
+        response.EnsureSuccessStatusCode();
+        
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task WhenTryingToDelete_AndNotBeingAuthorized_ThenGiveMeUnauthorized()
+    {
+        var client = await GetClientWithAuth();
+        
+        var gameResponseDto = await CreateGame("Denos 4", client);
+        
+        var clientNotAuth = _apiFactory.CreateClient();
+        
+        var response = await clientNotAuth.DeleteAsync(ApiEndpoints.V1.Games.DELETE.Replace("{id:Guid}", gameResponseDto.GameId.ToString()));
+        
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task WhenTryingToDelete_AndNotBeingAdmin_ThenGiveMeForbidden()
+    {
+        var client = await GetClientWithAuth(role: AuthConstants.TRUSTED_ROLE);
+        
+        var gameResponseDto = await CreateGame("Denos 1", client);
+        
+        var response = await client.DeleteAsync(ApiEndpoints.V1.Games.DELETE.Replace("{id:Guid}", gameResponseDto.GameId.ToString()));
+        
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    private async Task<HttpClient> GetClientWithAuth(string username = "pepeTest", string email = "pepeTest@gmail.com", string role = AuthConstants.ADMIN_ROLE)
     {
         TokenResponseDto token = await GetJwtAsync(Guid.NewGuid(), username: username, email: email, role: role);
 
