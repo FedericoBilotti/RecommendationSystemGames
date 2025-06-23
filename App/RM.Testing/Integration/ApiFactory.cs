@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using App;
-using App.Auth;
 using App.Dtos.Authentication.Request;
 using App.Interfaces;
 using App.Interfaces.Authentication;
@@ -15,8 +13,6 @@ using App.UseCases.Authentication;
 using App.UseCases.Engine;
 using DotNetEnv;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -24,13 +20,12 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.IdentityModel.Tokens;
 using RM.Domain.Entities;
 using RM.Infrastructure.Data;
 using RM.Infrastructure.Database;
 using Testcontainers.PostgreSql;
 
-namespace RM.Testing;
+namespace RM.Testing.Integration;
 
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
