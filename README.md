@@ -1,4 +1,4 @@
-# RecommendationSystemGames
+# GameExplorerAPI
 
 RESTful API built with ASP.NET Core for searching video games and submitting user ratings, designed with Clean Architecture and best practices for development, testing, and deployment.
 
