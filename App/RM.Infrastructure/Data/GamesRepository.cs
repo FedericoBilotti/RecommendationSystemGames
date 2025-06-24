@@ -105,19 +105,18 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
 
         var games = await connection.QueryAsync(new CommandDefinition($"""
                                                                        SELECT g.*, 
-                                                                              string_agg(DISTINCT gen.name, ', ') as genres, 
+                                                                              string_agg(DISTINCT gen.name, ', ') as genres,
                                                                               ROUND(AVG(r.rating), 1) as rating, 
-                                                                              myr.rating as UserRating
+                                                                              MAX(myr.rating) as myuserrating
                                                                        FROM games g
                                                                        LEFT JOIN genres gen ON g.gameId = gen.gameId
                                                                        LEFT JOIN ratings r ON g.gameId = r.gameId
-                                                                       LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId
+                                                                       LEFT JOIN ratings myr ON g.gameId = myr.gameId AND myr.userId = @userId 
                                                                        WHERE (@title IS NULL OR g.title LIKE ('%' || @title || '%'))
                                                                        AND (@yearOfRelease IS NULL OR g.yearOfRelease = @yearOfRelease)
-                                                                       GROUP BY g.gameId, myr.rating {orderClause}
+                                                                       GROUP BY g.gameid {orderClause}
                                                                        LIMIT @pageSize
                                                                        OFFSET @pageOffset
-
                                                                        """, new
         {
             userId = gameOptions.UserId,
@@ -126,8 +125,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
             pageSize = gameOptions.PageSize,
             pageOffset = (gameOptions.Page - 1) * gameOptions.PageSize
         }, cancellationToken: cancellationToken));
-
-
+        
         return games.Select(g => new Game
         {
             GameId = g.gameid,
@@ -135,7 +133,7 @@ public class GamesRepository(IDbConnectionFactory connectionFactory) : IGamesRep
             YearOfRelease = g.yearofrelease,
             Description = g.description,
             Rating = (float?)g.rating,
-            UserRating = (int?)g.userrating,
+            UserRating = (int?)g.myuserrating,
             Genres = Enumerable.ToList(g.genres.Split(','))
         });
     }

@@ -69,8 +69,10 @@ public class GameUseCase : IGameUseCase
         }
 
         (float? Rating, int? User) ratings = await _ratingRepository.GetUserRatingAsync(game.GameId, userId.Value, cancellationToken);
+        
         game.Rating = ratings.Rating;
         game.UserRating = ratings.User;
+        
         return game.MapToResponse();
     }
 
