@@ -38,8 +38,10 @@ public class RatingRepository(IDbConnectionFactory connectionFactory) : IRatingR
 
         return await connection.QueryFirstOrDefaultAsync<(float? Rating, int? User)>(new CommandDefinition("""
                                                                                                            SELECT ROUND(AVG(rating), 1),
-                                                                                                           (SELECT rating FROM ratings WHERE gameId = @gameId AND userId = @userId
-                                                                                                                                       LIMIT 1)
+                                                                                                               (SELECT rating 
+                                                                                                                FROM ratings 
+                                                                                                                WHERE gameId = @gameId AND userId = @userId
+                                                                                                                LIMIT 1)
                                                                                                            FROM ratings 
                                                                                                            WHERE gameId = @gameId
                                                                                                            """, new { gameId, userId }, cancellationToken: cancellationToken));
