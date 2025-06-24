@@ -37,8 +37,7 @@ POSTGRES_DB=your_db
 DOTNET_ENVIRONMENT=Development
 ```
 
-Then, simply execute:
-docker compose up --build
+Then, simply execute `docker compose up --build`
 
 This will:
 
