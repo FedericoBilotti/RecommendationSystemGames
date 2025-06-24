@@ -35,10 +35,10 @@ POSTGRES_DB=your_db
 
 # .NET environment
 DOTNET_ENVIRONMENT=Development
+```
 
 Then, simply execute:
 docker compose up --build
-```
 
 This will:
 
